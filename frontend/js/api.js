@@ -154,3 +154,38 @@ const attendanceAPI = {
         return fetchAPI('/attendance/me/stats');
     }
 };
+
+const marksAPI = {
+    getAll: async (student_id = '', subject = '', semester = '', exam_type = '') => {
+        const params = new URLSearchParams();
+        if (student_id) params.append('student_id', student_id);
+        if (subject) params.append('subject', subject);
+        if (semester) params.append('semester', semester);
+        if (exam_type) params.append('exam_type', exam_type);
+        return fetchAPI(`/marks/?${params.toString()}`);
+    },
+    
+    create: async (data) => {
+        return fetchAPI('/marks/', {
+            method: 'POST',
+            body: JSON.stringify(data)
+        });
+    },
+    
+    update: async (id, data) => {
+        return fetchAPI(`/marks/${id}`, {
+            method: 'PUT',
+            body: JSON.stringify(data)
+        });
+    },
+    
+    delete: async (id) => {
+        return fetchAPI(`/marks/${id}`, {
+            method: 'DELETE'
+        });
+    },
+    
+    getStats: async () => {
+        return fetchAPI('/marks/me/stats');
+    }
+};

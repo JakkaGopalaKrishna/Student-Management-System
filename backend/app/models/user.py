@@ -22,3 +22,4 @@ class User(Base):
     # Relationships
     student_profile = relationship("StudentProfile", back_populates="user", uselist=False, cascade="all, delete-orphan")
     attendance_records = relationship("Attendance", back_populates="student", cascade="all, delete-orphan")
+    marks = relationship("Mark", back_populates="student", cascade="all, delete-orphan")

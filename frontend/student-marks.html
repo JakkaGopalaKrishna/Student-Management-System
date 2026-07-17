@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My Marks - Campus Connect</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="css/variables.css">
+    <link rel="stylesheet" href="css/layout.css">
+    <link rel="stylesheet" href="css/components.css">
+    <style>
+        .stat-box {
+            padding: 24px;
+            border-radius: 12px;
+            text-align: center;
+            border: 1px solid var(--border-color);
+            background: var(--bg-color);
+        }
+        .stat-box h4 { color: var(--text-secondary); margin-bottom: 8px; font-size: 0.875rem; text-transform: uppercase; }
+        .stat-box p { font-size: 2rem; font-weight: 700; color: var(--text-primary); }
+        .grade-badge {
+            padding: 4px 10px;
+            border-radius: 12px;
+            font-size: 0.875rem;
+            font-weight: 600;
+        }
+        .grade-excellent { background: rgba(16, 185, 129, 0.1); color: var(--success-color); }
+        .grade-good { background: rgba(59, 130, 246, 0.1); color: var(--info-color); }
+        .grade-average { background: rgba(245, 158, 11, 0.1); color: var(--warning-color); }
+        .grade-poor { background: rgba(239, 68, 68, 0.1); color: var(--danger-color); }
+        
+        .semester-card {
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            padding: 16px;
+            margin-bottom: 16px;
+            background: var(--bg-color);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+    </style>
+</head>
+<body>
+    <div class="app-container">
+        <!-- Sidebar -->
+        <aside class="sidebar" id="sidebar">
+            <div class="sidebar-header">
+                <div class="logo">
+                    <i class="fas fa-graduation-cap logo-icon"></i>
+                    <span>CampusConnect</span>
+                </div>
+            </div>
+            <nav class="nav-menu">
+                <div class="nav-item" onclick="window.location.href='dashboard.html'">
+                    <i class="fas fa-chart-pie"></i>
+                    <span>Dashboard</span>
+                </div>
+                <div class="nav-item" onclick="window.location.href='student-attendance.html'">
+                    <i class="fas fa-calendar-check"></i>
+                    <span>My Attendance</span>
+                </div>
+                <div class="nav-item active">
+                    <i class="fas fa-graduation-cap"></i>
+                    <span>My Marks</span>
+                </div>
+            </nav>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <header class="top-nav">
+                <div class="nav-actions">
+                    <button class="btn-icon" id="menuToggle" style="display: none;"><i class="fas fa-bars"></i></button>
+                    <h2 style="font-size: 1.25rem;">My Marks</h2>
+                </div>
+                <div class="nav-actions">
+                    <button id="themeToggleBtn" class="btn-icon"><i class="fas fa-moon"></i></button>
+                    <button id="logoutBtn" class="btn-icon" title="Logout"><i class="fas fa-sign-out-alt"></i></button>
+                </div>
+            </header>
+
+            <div class="page-content">
+                
+                <!-- Overall Stats -->
+                <div class="dashboard-grid" style="margin-bottom: 24px;">
+                    <div class="stat-box" style="grid-column: span 2; border-color: rgba(59, 130, 246, 0.3);">
+                        <h4>Overall Percentage</h4>
+                        <p id="overallPercentage" style="color: var(--info-color); font-size: 2.5rem;">0%</p>
+                    </div>
+                    <div class="stat-box">
+                        <h4>Latest SGPA</h4>
+                        <p id="latestSgpa">0.0</p>
+                    </div>
+                </div>
+
+                <div class="dashboard-columns">
+                    <!-- Left Column: Tables -->
+                    <div style="flex: 2;">
+                        <div class="card" style="margin-bottom: 24px;">
+                            <h3 style="margin-bottom: 16px; display: flex; align-items: center; gap: 8px;">
+                                <i class="fas fa-clipboard-list" style="color: var(--warning-color);"></i> Internal Marks
+                            </h3>
+                            <div style="overflow-x: auto;">
+                                <table class="data-table">
+                                    <thead>
+                                        <tr>
+                                            <th>Semester</th>
+                                            <th>Subject</th>
+                                            <th>Obtained</th>
+                                            <th>Max</th>
+                                            <th>Grade</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="internalMarksTable">
+                                        <!-- Populated by JS -->
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+
+                        <div class="card">
+                            <h3 style="margin-bottom: 16px; display: flex; align-items: center; gap: 8px;">
+                                <i class="fas fa-award" style="color: var(--success-color);"></i> External Marks
+                            </h3>
+                            <div style="overflow-x: auto;">
+                                <table class="data-table">
+                                    <thead>
+                                        <tr>
+                                            <th>Semester</th>
+                                            <th>Subject</th>
+                                            <th>Obtained</th>
+                                            <th>Max</th>
+                                            <th>Grade</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="externalMarksTable">
+                                        <!-- Populated by JS -->
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Right Column: Semester Results -->
+                    <div style="flex: 1;">
+                        <div class="card">
+                            <h3 style="margin-bottom: 16px;"><i class="fas fa-chart-line" style="color: var(--primary-light);"></i> Semester Results</h3>
+                            <div id="semesterResultsContainer">
+                                <!-- Populated by JS -->
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <!-- Scripts -->
+    <script src="js/theme.js"></script>
+    <script src="js/api.js"></script>
+    <script src="js/student-marks.js"></script>
+</body>
+</html>
