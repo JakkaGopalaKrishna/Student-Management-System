@@ -127,4 +127,100 @@ document.addEventListener('DOMContentLoaded', async () => {
             modalMessage.style.color = 'var(--success-color)';
         }
     }
+
+    // Global Search Logic
+    const searchInput = document.getElementById('globalSearchInput');
+    const searchDropdown = document.getElementById('searchResultsDropdown');
+
+    if (searchInput) {
+        let debounceTimer;
+        
+        // Hide dropdown when clicking outside
+        document.addEventListener('click', (e) => {
+            if (!document.getElementById('globalSearchContainer').contains(e.target)) {
+                searchDropdown.style.display = 'none';
+            }
+        });
+
+        searchInput.addEventListener('focus', () => {
+            if (searchInput.value.trim().length >= 2) {
+                searchDropdown.style.display = 'block';
+            }
+        });
+
+        searchInput.addEventListener('input', (e) => {
+            clearTimeout(debounceTimer);
+            const query = e.target.value.trim();
+
+            if (query.length < 2) {
+                searchDropdown.style.display = 'none';
+                return;
+            }
+
+            debounceTimer = setTimeout(async () => {
+                try {
+                    searchDropdown.innerHTML = '<div style="padding: 16px; text-align: center; color: var(--text-secondary);"><i class="fas fa-spinner fa-spin"></i> Searching...</div>';
+                    searchDropdown.style.display = 'block';
+
+                    const response = await searchAPI.query(query);
+                    const results = response.results;
+
+                    if (results.length === 0) {
+                        searchDropdown.innerHTML = '<div style="padding: 16px; text-align: center; color: var(--text-secondary);">No results found.</div>';
+                        return;
+                    }
+
+                    // Group results by type
+                    const grouped = results.reduce((acc, curr) => {
+                        if (!acc[curr.type]) acc[curr.type] = [];
+                        acc[curr.type].push(curr);
+                        return acc;
+                    }, {});
+
+                    let html = '';
+                    const icons = {
+                        student: 'fa-user-graduate',
+                        note: 'fa-book',
+                        paper: 'fa-file-pdf',
+                        syllabus: 'fa-list-alt',
+                        notification: 'fa-bell'
+                    };
+
+                    const titles = {
+                        student: 'Students',
+                        note: 'Notes',
+                        paper: 'Previous Papers',
+                        syllabus: 'Syllabus / Subjects',
+                        notification: 'Announcements'
+                    };
+
+                    for (const [type, items] of Object.entries(grouped)) {
+                        html += `
+                            <div style="background: var(--bg-hover); padding: 8px 16px; font-size: 0.75rem; font-weight: 700; text-transform: uppercase; color: var(--text-secondary);">
+                                ${titles[type]}
+                            </div>
+                        `;
+                        items.forEach(item => {
+                            html += `
+                                <div style="padding: 12px 16px; border-bottom: 1px solid var(--border-color); cursor: pointer; display: flex; align-items: center; gap: 12px; transition: background 0.2s;" onmouseover="this.style.background='var(--bg-hover)'" onmouseout="this.style.background='transparent'" onclick="window.location.href='${item.link}'">
+                                    <div style="width: 32px; height: 32px; border-radius: 8px; background: rgba(59, 130, 246, 0.1); color: var(--primary-color); display: flex; align-items: center; justify-content: center;">
+                                        <i class="fas ${icons[type]}"></i>
+                                    </div>
+                                    <div>
+                                        <div style="font-weight: 600; color: var(--text-primary); font-size: 0.875rem;">${item.title}</div>
+                                        ${item.subtitle ? `<div style="font-size: 0.75rem; color: var(--text-secondary); margin-top: 2px;">${item.subtitle}</div>` : ''}
+                                    </div>
+                                </div>
+                            `;
+                        });
+                    }
+
+                    searchDropdown.innerHTML = html;
+                } catch (error) {
+                    console.error('Search failed', error);
+                    searchDropdown.innerHTML = '<div style="padding: 16px; text-align: center; color: var(--danger-color);">Error loading results.</div>';
+                }
+            }, 300);
+        });
+    }
 });

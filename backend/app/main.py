@@ -1,7 +1,7 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
-from app.api.routes import auth, students, attendance, marks, fees, notes, papers, syllabus, holidays, notifications, timetable
+from app.api.routes import auth, students, attendance, marks, fees, notes, papers, syllabus, holidays, notifications, timetable, search
 from app.core.database import engine, Base
 
 # Create database tables
@@ -33,6 +33,7 @@ app.include_router(syllabus.router, prefix="/api/syllabus", tags=["syllabus"])
 app.include_router(holidays.router, prefix="/api/holidays", tags=["holidays"])
 app.include_router(notifications.router, prefix="/api/notifications", tags=["notifications"])
 app.include_router(timetable.router, prefix="/api/timetable", tags=["timetable"])
+app.include_router(search.router, prefix="/api/search", tags=["search"])
 
 import os
 os.makedirs("uploads/profiles", exist_ok=True)

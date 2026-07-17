@@ -74,15 +74,19 @@
                     <i class="fas fa-bell"></i>
                     <span>Announcements</span>
                 </div>
+                <div class="nav-item admin-only" style="display: none;" onclick="window.location.href='reports.html'">
+                    <i class="fas fa-file-alt"></i>
+                    <span>Reports</span>
+                </div>
                 <div class="nav-item student-only" style="display: none;" onclick="window.location.href='student-notifications.html'">
                     <i class="fas fa-bell"></i>
                     <span>Notifications</span>
                 </div>
-                <div class="nav-item" id="navChangePassword">
+                <div class="nav-item" id="navChangePassword" style="display: none;">
                     <i class="fas fa-lock"></i>
                     <span>Change Password</span>
                 </div>
-                <div class="nav-item" id="navSettings" style="display: none;">
+                <div class="nav-item" id="navSettings" onclick="window.location.href='settings.html'">
                     <i class="fas fa-cog"></i>
                     <span>Settings</span>
                 </div>
@@ -99,6 +103,19 @@
                     </button>
                     <h2 style="font-size: 1.25rem;">Overview</h2>
                 </div>
+                
+                <!-- Global Search -->
+                <div style="flex-grow: 1; max-width: 400px; margin: 0 24px; position: relative;" id="globalSearchContainer">
+                    <div style="position: relative; display: flex; align-items: center;">
+                        <i class="fas fa-search" style="position: absolute; left: 16px; color: var(--text-secondary);"></i>
+                        <input type="text" id="globalSearchInput" class="form-control" placeholder="Search students, notes, syllabus..." style="padding-left: 40px; width: 100%; border-radius: 20px;">
+                    </div>
+                    <!-- Dropdown Results -->
+                    <div id="searchResultsDropdown" style="display: none; position: absolute; top: 100%; left: 0; right: 0; background: var(--bg-color); border: 1px solid var(--border-color); border-radius: 12px; margin-top: 8px; box-shadow: 0 4px 12px rgba(0,0,0,0.1); z-index: 1000; max-height: 400px; overflow-y: auto;">
+                        <!-- Results injected by JS -->
+                    </div>
+                </div>
+
                 <div class="nav-actions">
                     <button id="themeToggleBtn" class="btn-icon"><i class="fas fa-moon"></i></button>
                     

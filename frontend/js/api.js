@@ -429,3 +429,9 @@ const timetableAPI = {
         });
     }
 };
+
+const searchAPI = {
+    query: async (q) => {
+        return fetchAPI(`/search/?q=${encodeURIComponent(q)}`);
+    }
+};
