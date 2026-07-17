@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Login - Campus Connect</title>
+    <title>Authentication - Campus Connect</title>
     <!-- Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -13,6 +13,28 @@
     <!-- CSS -->
     <link rel="stylesheet" href="css/variables.css">
     <link rel="stylesheet" href="css/components.css">
+    <style>
+        .form-panel {
+            display: none;
+            animation: fadeIn 0.3s ease-in-out;
+        }
+        .form-panel.active {
+            display: block;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .auth-links {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 16px;
+            font-size: 0.875rem;
+        }
+        .auth-links a {
+            cursor: pointer;
+        }
+    </style>
 </head>
 <body>
     <div class="auth-wrapper">
@@ -25,21 +47,74 @@
                 <p style="color: var(--text-secondary); margin-top: 8px;">Smart Student Management System</p>
             </div>
             
-            <div id="errorMessage" style="display: none; background: rgba(239, 68, 68, 0.1); color: var(--danger-color); padding: 12px; border-radius: 8px; margin-bottom: 20px; text-align: center; font-size: 0.875rem;"></div>
+            <div id="globalMessage" style="display: none; padding: 12px; border-radius: 8px; margin-bottom: 20px; text-align: center; font-size: 0.875rem;"></div>
 
-            <form id="loginForm">
-                <div class="form-group">
-                    <label class="form-label" for="email">Email Address</label>
-                    <input type="email" id="email" class="form-control" placeholder="Enter your email" required>
-                </div>
-                <div class="form-group">
-                    <label class="form-label" for="password">Password</label>
-                    <input type="password" id="password" class="form-control" placeholder="Enter your password" required>
-                </div>
-                <button type="submit" class="btn btn-primary" style="width: 100%; margin-top: 10px; padding: 12px;">
-                    Sign In
-                </button>
-            </form>
+            <!-- LOGIN FORM -->
+            <div id="loginPanel" class="form-panel active">
+                <form id="loginForm">
+                    <div class="form-group">
+                        <label class="form-label" for="loginEmail">Email Address</label>
+                        <input type="email" id="loginEmail" class="form-control" placeholder="Enter your email" required>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label" for="loginPassword">Password</label>
+                        <input type="password" id="loginPassword" class="form-control" placeholder="Enter your password" required>
+                    </div>
+                    <button type="submit" class="btn btn-primary" style="width: 100%; margin-top: 10px; padding: 12px;">
+                        Sign In
+                    </button>
+                    <div class="auth-links">
+                        <a onclick="switchPanel('forgotPanel')">Forgot Password?</a>
+                        <a onclick="switchPanel('registerPanel')">Create Student Account</a>
+                    </div>
+                </form>
+            </div>
+
+            <!-- REGISTER FORM (STUDENT) -->
+            <div id="registerPanel" class="form-panel">
+                <h3 style="margin-bottom: 16px; text-align: center;">Student Registration</h3>
+                <form id="registerForm">
+                    <div class="form-group">
+                        <label class="form-label" for="regName">Full Name</label>
+                        <input type="text" id="regName" class="form-control" placeholder="John Doe" required>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label" for="regEmail">Email Address</label>
+                        <input type="email" id="regEmail" class="form-control" placeholder="student@example.com" required>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label" for="regPassword">Password</label>
+                        <input type="password" id="regPassword" class="form-control" placeholder="Create a password" required>
+                    </div>
+                    <button type="submit" class="btn btn-primary" style="width: 100%; margin-top: 10px; padding: 12px;">
+                        Register
+                    </button>
+                    <div class="auth-links" style="justify-content: center;">
+                        <span style="color: var(--text-secondary);">Already have an account? <a onclick="switchPanel('loginPanel')">Sign In</a></span>
+                    </div>
+                </form>
+            </div>
+
+            <!-- FORGOT PASSWORD FORM -->
+            <div id="forgotPanel" class="form-panel">
+                <h3 style="margin-bottom: 16px; text-align: center;">Reset Password</h3>
+                <p style="color: var(--text-secondary); font-size: 0.875rem; text-align: center; margin-bottom: 16px;">
+                    Enter your email and we'll send you a reset link.
+                </p>
+                <form id="forgotForm">
+                    <div class="form-group">
+                        <label class="form-label" for="forgotEmail">Email Address</label>
+                        <input type="email" id="forgotEmail" class="form-control" placeholder="Enter your email" required>
+                    </div>
+                    <button type="submit" class="btn btn-primary" style="width: 100%; margin-top: 10px; padding: 12px;">
+                        Send Reset Link
+                    </button>
+                    <div class="auth-links" style="justify-content: center;">
+                        <span style="color: var(--text-secondary);">Remember your password? <a onclick="switchPanel('loginPanel')">Sign In</a></span>
+                    </div>
+                </form>
+            </div>
+
             <div style="text-align: center; margin-top: 24px;">
                 <button id="themeToggleBtn" class="btn btn-icon" style="position: absolute; top: 20px; right: 20px;">
                     <i class="fas fa-moon"></i>

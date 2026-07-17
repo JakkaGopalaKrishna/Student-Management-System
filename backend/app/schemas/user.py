@@ -9,6 +9,7 @@ class UserBase(BaseModel):
 
 class UserCreate(UserBase):
     password: str
+    role: UserRole = UserRole.STUDENT # Force student role on normal registration
 
 class UserUpdate(BaseModel):
     full_name: Optional[str] = None
@@ -28,3 +29,14 @@ class Token(BaseModel):
 
 class TokenData(BaseModel):
     email: Optional[str] = None
+    
+class ForgotPassword(BaseModel):
+    email: EmailStr
+
+class ResetPassword(BaseModel):
+    token: str
+    new_password: str
+
+class ChangePassword(BaseModel):
+    current_password: str
+    new_password: str

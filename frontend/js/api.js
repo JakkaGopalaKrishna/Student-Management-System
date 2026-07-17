@@ -51,5 +51,17 @@ const authAPI = {
         }
         return data;
     },
+    register: (name, email, password) => fetchAPI('/auth/register', {
+        method: 'POST',
+        body: JSON.stringify({ full_name: name, email, password })
+    }),
+    forgotPassword: (email) => fetchAPI('/auth/forgot-password', {
+        method: 'POST',
+        body: JSON.stringify({ email })
+    }),
+    changePassword: (currentPassword, newPassword) => fetchAPI('/auth/change-password', {
+        method: 'POST',
+        body: JSON.stringify({ current_password: currentPassword, new_password: newPassword })
+    }),
     getMe: () => fetchAPI('/auth/me'),
 };

@@ -42,7 +42,11 @@
                     <i class="fas fa-book"></i>
                     <span>Courses</span>
                 </div>
-                <div class="nav-item">
+                <div class="nav-item" id="navChangePassword">
+                    <i class="fas fa-lock"></i>
+                    <span>Change Password</span>
+                </div>
+                <div class="nav-item" id="navSettings" style="display: none;">
                     <i class="fas fa-cog"></i>
                     <span>Settings</span>
                 </div>
@@ -114,7 +118,7 @@
                 </div>
 
                 <!-- Recent Activity Table Placeholder -->
-                <div class="card">
+                <div class="card" id="adminActivityCard" style="display: none;">
                     <h3 style="margin-bottom: 20px;">Recent Registrations</h3>
                     <div style="overflow-x: auto;">
                         <table class="data-table">
@@ -135,19 +139,43 @@
                                     <td><span style="color: var(--success-color); font-weight: 500;">Active</span></td>
                                     <td>Oct 24, 2023</td>
                                 </tr>
-                                <tr>
-                                    <td>#ST-002</td>
-                                    <td>Jane Smith</td>
-                                    <td>Electrical Eng.</td>
-                                    <td><span style="color: var(--success-color); font-weight: 500;">Active</span></td>
-                                    <td>Oct 23, 2023</td>
-                                </tr>
                             </tbody>
                         </table>
                     </div>
                 </div>
+
+                <div class="card" id="studentWelcomeCard" style="display: none;">
+                    <h3 style="margin-bottom: 20px;">Welcome to your Dashboard!</h3>
+                    <p style="color: var(--text-secondary);">Here you can view your courses, grades, and upcoming assignments.</p>
+                </div>
             </div>
         </main>
+    </div>
+
+    <!-- Change Password Modal -->
+    <div id="changePasswordModal" style="display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.5); z-index: 999; align-items: center; justify-content: center; backdrop-filter: blur(4px);">
+        <div class="card" style="width: 100%; max-width: 400px; margin: 20px; position: relative;">
+            <button id="closeModalBtn" style="position: absolute; top: 16px; right: 16px; background: none; border: none; font-size: 1.25rem; color: var(--text-secondary); cursor: pointer;"><i class="fas fa-times"></i></button>
+            <h3 style="margin-bottom: 20px;">Change Password</h3>
+            
+            <div id="modalMessage" style="display: none; padding: 12px; border-radius: 8px; margin-bottom: 16px; font-size: 0.875rem;"></div>
+
+            <form id="changePasswordForm">
+                <div class="form-group">
+                    <label class="form-label">Current Password</label>
+                    <input type="password" id="currentPassword" class="form-control" required>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">New Password</label>
+                    <input type="password" id="newPasswordChange" class="form-control" required>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Confirm New Password</label>
+                    <input type="password" id="confirmNewPassword" class="form-control" required>
+                </div>
+                <button type="submit" class="btn btn-primary" style="width: 100%;">Update Password</button>
+            </form>
+        </div>
     </div>
 
     <!-- Scripts -->

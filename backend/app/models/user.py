@@ -1,11 +1,10 @@
-from sqlalchemy import Column, Integer, String, Boolean, Enum
+from sqlalchemy import Column, Integer, String, Boolean, Enum, DateTime
 from app.core.database import Base
 import enum
 
 class UserRole(str, enum.Enum):
     ADMIN = "admin"
     STUDENT = "student"
-    TEACHER = "teacher"
 
 class User(Base):
     __tablename__ = "users"
@@ -16,3 +15,5 @@ class User(Base):
     full_name = Column(String(100), nullable=False)
     role = Column(Enum(UserRole), default=UserRole.STUDENT, nullable=False)
     is_active = Column(Boolean, default=True)
+    reset_password_token = Column(String(255), nullable=True, index=True)
+    reset_password_expire = Column(DateTime, nullable=True)
