@@ -1,7 +1,7 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
-from app.api.routes import auth, students, attendance, marks
+from app.api.routes import auth, students, attendance, marks, fees, notes, papers
 from app.core.database import engine, Base
 
 # Create database tables
@@ -26,9 +26,15 @@ app.include_router(auth.router, prefix="/api/auth", tags=["auth"])
 app.include_router(students.router, prefix="/api/students", tags=["students"])
 app.include_router(attendance.router, prefix="/api/attendance", tags=["attendance"])
 app.include_router(marks.router, prefix="/api/marks", tags=["marks"])
+app.include_router(fees.router, prefix="/api/fees", tags=["fees"])
+app.include_router(notes.router, prefix="/api/notes", tags=["notes"])
+app.include_router(papers.router, prefix="/api/papers", tags=["papers"])
 
 import os
-os.makedirs("uploads", exist_ok=True)
+os.makedirs("uploads/profiles", exist_ok=True)
+os.makedirs("uploads/notes", exist_ok=True)
+os.makedirs("uploads/papers", exist_ok=True)
+
 app.mount("/uploads", StaticFiles(directory="uploads"), name="uploads")
 
 @app.get("/")

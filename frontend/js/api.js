@@ -3,10 +3,12 @@ const BASE_URL = 'http://localhost:8000/api';
 const fetchAPI = async (endpoint, options = {}) => {
     const token = localStorage.getItem('token');
     
-    const headers = {
-        'Content-Type': 'application/json',
-        ...options.headers,
-    };
+    const headers = { ...options.headers };
+    
+    // Auto-set JSON content type if it's not FormData
+    if (!(options.body instanceof FormData) && !headers['Content-Type']) {
+        headers['Content-Type'] = 'application/json';
+    }
 
     if (token) {
         headers['Authorization'] = `Bearer ${token}`;
@@ -187,5 +189,109 @@ const marksAPI = {
     
     getStats: async () => {
         return fetchAPI('/marks/me/stats');
+    }
+};
+
+const feesAPI = {
+    getAll: async (student_id = '', status = '') => {
+        const params = new URLSearchParams();
+        if (student_id) params.append('student_id', student_id);
+        if (status) params.append('status', status);
+        return fetchAPI(`/fees/?${params.toString()}`);
+    },
+    
+    create: async (data) => {
+        return fetchAPI('/fees/', {
+            method: 'POST',
+            body: JSON.stringify(data)
+        });
+    },
+    
+    update: async (id, data) => {
+        return fetchAPI(`/fees/${id}`, {
+            method: 'PUT',
+            body: JSON.stringify(data)
+        });
+    },
+    
+    delete: async (id) => {
+        return fetchAPI(`/fees/${id}`, {
+            method: 'DELETE'
+        });
+    },
+    
+    recordPayment: async (fee_id, data) => {
+        return fetchAPI(`/fees/${fee_id}/payments`, {
+            method: 'POST',
+            body: JSON.stringify(data)
+        });
+    },
+    
+    getStats: async () => {
+        return fetchAPI('/fees/me/stats');
+    }
+};
+
+const notesAPI = {
+    getAll: async (branch = '', semester = '', subject = '', search = '') => {
+        const params = new URLSearchParams();
+        if (branch) params.append('branch', branch);
+        if (semester) params.append('semester', semester);
+        if (subject) params.append('subject', subject);
+        if (search) params.append('search', search);
+        return fetchAPI(`/notes/?${params.toString()}`);
+    },
+    
+    upload: async (formData) => {
+        // formData is a FormData object containing file and fields
+        return fetchAPI('/notes/', {
+            method: 'POST',
+            body: formData
+        });
+    },
+    
+    update: async (id, data) => {
+        return fetchAPI(`/notes/${id}`, {
+            method: 'PUT',
+            body: JSON.stringify(data)
+        });
+    },
+    
+    delete: async (id) => {
+        return fetchAPI(`/notes/${id}`, {
+            method: 'DELETE'
+        });
+    }
+};
+
+const papersAPI = {
+    getAll: async (branch = '', semester = '', subject = '', year = '', search = '') => {
+        const params = new URLSearchParams();
+        if (branch) params.append('branch', branch);
+        if (semester) params.append('semester', semester);
+        if (subject) params.append('subject', subject);
+        if (year) params.append('year', year);
+        if (search) params.append('search', search);
+        return fetchAPI(`/papers/?${params.toString()}`);
+    },
+    
+    upload: async (formData) => {
+        return fetchAPI('/papers/', {
+            method: 'POST',
+            body: formData
+        });
+    },
+    
+    update: async (id, data) => {
+        return fetchAPI(`/papers/${id}`, {
+            method: 'PUT',
+            body: JSON.stringify(data)
+        });
+    },
+    
+    delete: async (id) => {
+        return fetchAPI(`/papers/${id}`, {
+            method: 'DELETE'
+        });
     }
 };

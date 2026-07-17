@@ -1,0 +1,280 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Fee Management - Campus Connect</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="css/variables.css">
+    <link rel="stylesheet" href="css/layout.css">
+    <link rel="stylesheet" href="css/components.css">
+    <style>
+        .filter-bar {
+            display: flex;
+            gap: 16px;
+            margin-bottom: 24px;
+            flex-wrap: wrap;
+            align-items: flex-end;
+            background: var(--bg-color);
+            padding: 16px;
+            border-radius: 8px;
+            border: 1px solid var(--border-color);
+        }
+        .filter-item {
+            flex: 1;
+            min-width: 150px;
+        }
+        .modal {
+            display: none;
+            position: fixed;
+            inset: 0;
+            background: rgba(0,0,0,0.5);
+            z-index: 1000;
+            align-items: center;
+            justify-content: center;
+            backdrop-filter: blur(4px);
+        }
+        .modal-content {
+            width: 100%;
+            max-width: 500px;
+            background: var(--bg-color);
+            border-radius: 12px;
+            padding: 24px;
+            position: relative;
+        }
+        .modal-close {
+            position: absolute;
+            top: 24px;
+            right: 24px;
+            background: none;
+            border: none;
+            font-size: 1.25rem;
+            color: var(--text-secondary);
+            cursor: pointer;
+        }
+        .grid-2 {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 16px;
+        }
+        .action-btns {
+            display: flex;
+            gap: 8px;
+        }
+        .action-btns button {
+            width: 32px;
+            height: 32px;
+            border-radius: 6px;
+            border: none;
+            cursor: pointer;
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .btn-pay { background: var(--success-color); }
+        .btn-edit { background: var(--warning-color); }
+        .btn-delete { background: var(--danger-color); }
+        .btn-view { background: var(--info-color); }
+
+        .status-badge {
+            padding: 4px 10px;
+            border-radius: 12px;
+            font-size: 0.875rem;
+            font-weight: 600;
+        }
+        .status-paid { background: rgba(16, 185, 129, 0.1); color: var(--success-color); }
+        .status-partial { background: rgba(59, 130, 246, 0.1); color: var(--info-color); }
+        .status-pending { background: rgba(239, 68, 68, 0.1); color: var(--danger-color); }
+    </style>
+</head>
+<body>
+    <div class="app-container">
+        <!-- Sidebar -->
+        <aside class="sidebar" id="sidebar">
+            <div class="sidebar-header">
+                <div class="logo">
+                    <i class="fas fa-graduation-cap logo-icon"></i>
+                    <span>CampusConnect</span>
+                </div>
+            </div>
+            <nav class="nav-menu">
+                <div class="nav-item" onclick="window.location.href='dashboard.html'">
+                    <i class="fas fa-chart-pie"></i>
+                    <span>Dashboard</span>
+                </div>
+                <div class="nav-item admin-only" onclick="window.location.href='students.html'">
+                    <i class="fas fa-user-graduate"></i>
+                    <span>Students</span>
+                </div>
+                <div class="nav-item admin-only" onclick="window.location.href='attendance.html'">
+                    <i class="fas fa-calendar-check"></i>
+                    <span>Attendance</span>
+                </div>
+                <div class="nav-item admin-only" onclick="window.location.href='marks.html'">
+                    <i class="fas fa-graduation-cap"></i>
+                    <span>Marks</span>
+                </div>
+                <div class="nav-item active admin-only">
+                    <i class="fas fa-file-invoice-dollar"></i>
+                    <span>Fees</span>
+                </div>
+            </nav>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <header class="top-nav">
+                <div class="nav-actions">
+                    <button class="btn-icon" id="menuToggle" style="display: none;"><i class="fas fa-bars"></i></button>
+                    <h2 style="font-size: 1.25rem;">Fee Management</h2>
+                </div>
+                <div class="nav-actions">
+                    <button id="themeToggleBtn" class="btn-icon"><i class="fas fa-moon"></i></button>
+                    <button id="logoutBtn" class="btn-icon" title="Logout"><i class="fas fa-sign-out-alt"></i></button>
+                </div>
+            </header>
+
+            <div class="page-content">
+                <div class="card">
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px;">
+                        <h3 style="margin: 0;">Fee Demands Directory</h3>
+                        <button class="btn btn-primary" id="openAddFeeModalBtn">
+                            <i class="fas fa-plus"></i> Add Fee Demand
+                        </button>
+                    </div>
+
+                    <div class="filter-bar">
+                        <div class="filter-item">
+                            <label class="form-label">Search Student (ID)</label>
+                            <input type="number" id="searchStudentId" class="form-control" placeholder="e.g. 2">
+                        </div>
+                        <div class="filter-item">
+                            <label class="form-label">Status</label>
+                            <select id="searchStatus" class="form-control">
+                                <option value="">All Statuses</option>
+                                <option value="Pending">Pending</option>
+                                <option value="Partial">Partial</option>
+                                <option value="Paid">Paid</option>
+                            </select>
+                        </div>
+                        <button class="btn btn-primary" id="searchBtn" style="height: 42px;">
+                            Search
+                        </button>
+                    </div>
+
+                    <div style="overflow-x: auto;">
+                        <table class="data-table">
+                            <thead>
+                                <tr>
+                                    <th>Student ID</th>
+                                    <th>Title</th>
+                                    <th>Total Amount</th>
+                                    <th>Paid Amount</th>
+                                    <th>Balance</th>
+                                    <th>Due Date</th>
+                                    <th>Status</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody id="feesTableBody">
+                                <!-- Populated by JS -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <!-- Add/Edit Fee Demand Modal -->
+    <div id="feeModal" class="modal">
+        <div class="modal-content">
+            <button class="modal-close" onclick="closeFeeModal()"><i class="fas fa-times"></i></button>
+            <h3 id="feeModalTitle" style="margin-bottom: 24px;">Add Fee Demand</h3>
+            
+            <form id="feeForm">
+                <input type="hidden" id="feeId">
+                
+                <div class="form-group" id="studentSelectGroup">
+                    <label class="form-label">Select Student</label>
+                    <select id="feeStudentId" class="form-control" required>
+                        <option value="">Loading students...</option>
+                    </select>
+                </div>
+                
+                <div class="form-group">
+                    <label class="form-label">Fee Title</label>
+                    <input type="text" id="feeTitle" class="form-control" placeholder="e.g. Fall 2023 Tuition" required>
+                </div>
+                
+                <div class="grid-2">
+                    <div class="form-group">
+                        <label class="form-label">Total Amount ($)</label>
+                        <input type="number" id="feeTotal" class="form-control" step="0.01" required>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Due Date</label>
+                        <input type="date" id="feeDueDate" class="form-control" required>
+                    </div>
+                </div>
+
+                <button type="submit" class="btn btn-primary" style="width: 100%; margin-top: 16px;">Save Fee</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Record Payment Modal -->
+    <div id="paymentModal" class="modal">
+        <div class="modal-content">
+            <button class="modal-close" onclick="closePaymentModal()"><i class="fas fa-times"></i></button>
+            <h3 style="margin-bottom: 24px;">Record Payment</h3>
+            
+            <div style="background: var(--bg-color); border: 1px solid var(--border-color); padding: 16px; border-radius: 8px; margin-bottom: 24px;">
+                <p style="font-size: 0.875rem; color: var(--text-secondary); margin-bottom: 4px;">Pending Balance</p>
+                <p id="pendingBalanceDisplay" style="font-size: 1.5rem; font-weight: 700; color: var(--danger-color);">$0.00</p>
+            </div>
+
+            <form id="paymentForm">
+                <input type="hidden" id="paymentFeeId">
+                
+                <div class="form-group">
+                    <label class="form-label">Payment Amount ($)</label>
+                    <input type="number" id="payAmount" class="form-control" step="0.01" required>
+                </div>
+                
+                <div class="grid-2">
+                    <div class="form-group">
+                        <label class="form-label">Payment Method</label>
+                        <select id="payMethod" class="form-control" required>
+                            <option value="Cash">Cash</option>
+                            <option value="Bank Transfer">Bank Transfer</option>
+                            <option value="Credit Card">Credit Card</option>
+                            <option value="Online Portal">Online Portal</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Payment Date</label>
+                        <input type="date" id="payDate" class="form-control" required>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">Reference / Transaction Number (Optional)</label>
+                    <input type="text" id="payReference" class="form-control">
+                </div>
+
+                <button type="submit" class="btn btn-primary" style="width: 100%; margin-top: 16px;">Confirm Payment</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Scripts -->
+    <script src="js/theme.js"></script>
+    <script src="js/api.js"></script>
+    <script src="js/fees.js"></script>
+</body>
+</html>

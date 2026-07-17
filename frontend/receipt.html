@@ -1,0 +1,208 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Fee Receipt</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f3f4f6;
+            margin: 0;
+            padding: 40px 20px;
+            display: flex;
+            justify-content: center;
+        }
+        .receipt-container {
+            background-color: #ffffff;
+            width: 100%;
+            max-width: 600px;
+            padding: 40px;
+            border-radius: 8px;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+        }
+        .receipt-header {
+            text-align: center;
+            border-bottom: 2px solid #e5e7eb;
+            padding-bottom: 24px;
+            margin-bottom: 24px;
+        }
+        .receipt-header h1 {
+            margin: 0 0 8px 0;
+            color: #111827;
+            font-size: 1.5rem;
+        }
+        .receipt-header p {
+            margin: 0;
+            color: #6b7280;
+            font-size: 0.875rem;
+        }
+        .receipt-details {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 16px;
+            margin-bottom: 32px;
+        }
+        .detail-group {
+            margin-bottom: 8px;
+        }
+        .detail-label {
+            font-size: 0.75rem;
+            text-transform: uppercase;
+            color: #6b7280;
+            font-weight: 600;
+        }
+        .detail-value {
+            font-size: 1rem;
+            color: #111827;
+            font-weight: 500;
+            margin-top: 4px;
+        }
+        .amount-section {
+            background-color: #f9fafb;
+            padding: 24px;
+            border-radius: 8px;
+            text-align: center;
+            margin-bottom: 32px;
+        }
+        .amount-label {
+            font-size: 0.875rem;
+            color: #6b7280;
+            margin-bottom: 8px;
+        }
+        .amount-value {
+            font-size: 2.5rem;
+            font-weight: 700;
+            color: #10b981;
+            margin: 0;
+        }
+        .receipt-footer {
+            text-align: center;
+            color: #9ca3af;
+            font-size: 0.75rem;
+            border-top: 1px dashed #e5e7eb;
+            padding-top: 24px;
+        }
+        @media print {
+            body {
+                background-color: #ffffff;
+                padding: 0;
+            }
+            .receipt-container {
+                box-shadow: none;
+                padding: 20px;
+                max-width: 100%;
+            }
+            .no-print {
+                display: none !important;
+            }
+        }
+        .print-btn {
+            display: block;
+            width: 100%;
+            padding: 12px;
+            background-color: #3b82f6;
+            color: white;
+            border: none;
+            border-radius: 6px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            margin-top: 24px;
+            text-align: center;
+            text-decoration: none;
+        }
+        .print-btn:hover {
+            background-color: #2563eb;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="receipt-container">
+        <div class="receipt-header">
+            <h1>Campus Connect</h1>
+            <p>Official Fee Payment Receipt</p>
+        </div>
+
+        <div class="amount-section">
+            <div class="amount-label">Amount Paid</div>
+            <div class="amount-value" id="rAmount">$0.00</div>
+        </div>
+
+        <div class="receipt-details">
+            <div class="detail-group">
+                <div class="detail-label">Receipt No</div>
+                <div class="detail-value" id="rNo">Loading...</div>
+            </div>
+            <div class="detail-group">
+                <div class="detail-label">Date</div>
+                <div class="detail-value" id="rDate">Loading...</div>
+            </div>
+            <div class="detail-group">
+                <div class="detail-label">Student Name</div>
+                <div class="detail-value" id="rName">Loading...</div>
+            </div>
+            <div class="detail-group">
+                <div class="detail-label">Roll Number</div>
+                <div class="detail-value" id="rRoll">Loading...</div>
+            </div>
+            <div class="detail-group" style="grid-column: span 2;">
+                <div class="detail-label">Fee Description</div>
+                <div class="detail-value" id="rTitle">Loading...</div>
+            </div>
+            <div class="detail-group">
+                <div class="detail-label">Payment Method</div>
+                <div class="detail-value" id="rMethod">Loading...</div>
+            </div>
+            <div class="detail-group">
+                <div class="detail-label">Reference ID</div>
+                <div class="detail-value" id="rRef">N/A</div>
+            </div>
+        </div>
+
+        <div class="receipt-footer">
+            <p>This is a computer-generated receipt and does not require a physical signature.</p>
+        </div>
+
+        <button class="print-btn no-print" onclick="window.print()">Print Receipt</button>
+    </div>
+
+    <script src="js/api.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', async () => {
+            const urlParams = new URLSearchParams(window.location.search);
+            const paymentId = urlParams.get('id');
+            
+            if (!paymentId) {
+                alert('No payment ID provided.');
+                return;
+            }
+
+            try {
+                // We'll add this specific endpoint call directly since it's simple
+                const token = localStorage.getItem('token');
+                const response = await fetch(`http://localhost:8000/api/fees/payments/${paymentId}/receipt`, {
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+                
+                if (!response.ok) throw new Error('Failed to load receipt');
+                const data = await response.json();
+                
+                document.getElementById('rAmount').textContent = `$${data.amount_paid.toFixed(2)}`;
+                document.getElementById('rNo').textContent = data.receipt_no;
+                document.getElementById('rDate').textContent = data.date;
+                document.getElementById('rName').textContent = data.student_name;
+                document.getElementById('rRoll').textContent = data.student_roll;
+                document.getElementById('rTitle').textContent = data.fee_title;
+                document.getElementById('rMethod').textContent = data.payment_method;
+                document.getElementById('rRef').textContent = data.reference || 'N/A';
+
+            } catch (error) {
+                alert(error.message);
+            }
+        });
+    </script>
+</body>
+</html>
