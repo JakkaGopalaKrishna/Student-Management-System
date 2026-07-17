@@ -18,9 +18,15 @@ document.addEventListener('DOMContentLoaded', async () => {
         // Role based UI logic
         if (currentUser.role === 'admin') {
             document.getElementById('navSettings').style.display = 'flex';
-            document.getElementById('adminActivityCard').style.display = 'block';
+            document.getElementById('adminDashboard').style.display = 'block';
+            
+            // Show all admin sidebar items
+            document.querySelectorAll('.admin-only').forEach(el => {
+                el.style.display = 'flex';
+            });
         } else {
-            document.getElementById('studentWelcomeCard').style.display = 'block';
+            document.getElementById('studentDashboard').style.display = 'block';
+            document.getElementById('displayStudentName').textContent = currentUser.full_name;
         }
     } catch (error) {
         console.error('Failed to load user session');

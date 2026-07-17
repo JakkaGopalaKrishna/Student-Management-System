@@ -30,17 +30,41 @@
                     <i class="fas fa-chart-pie"></i>
                     <span>Dashboard</span>
                 </div>
-                <div class="nav-item">
+                <div class="nav-item admin-only" style="display: none;">
                     <i class="fas fa-user-graduate"></i>
                     <span>Students</span>
                 </div>
-                <div class="nav-item">
-                    <i class="fas fa-chalkboard-teacher"></i>
-                    <span>Teachers</span>
+                <div class="nav-item admin-only" style="display: none;">
+                    <i class="fas fa-book-open"></i>
+                    <span>Subjects</span>
                 </div>
-                <div class="nav-item">
-                    <i class="fas fa-book"></i>
-                    <span>Courses</span>
+                <div class="nav-item admin-only" style="display: none;">
+                    <i class="fas fa-calendar-check"></i>
+                    <span>Attendance</span>
+                </div>
+                <div class="nav-item admin-only" style="display: none;">
+                    <i class="fas fa-graduation-cap"></i>
+                    <span>Marks</span>
+                </div>
+                <div class="nav-item admin-only" style="display: none;">
+                    <i class="fas fa-file-invoice-dollar"></i>
+                    <span>Fees</span>
+                </div>
+                <div class="nav-item admin-only" style="display: none;">
+                    <i class="fas fa-file-alt"></i>
+                    <span>Notes</span>
+                </div>
+                <div class="nav-item admin-only" style="display: none;">
+                    <i class="fas fa-file-pdf"></i>
+                    <span>Previous Papers</span>
+                </div>
+                <div class="nav-item admin-only" style="display: none;">
+                    <i class="fas fa-umbrella-beach"></i>
+                    <span>Holidays</span>
+                </div>
+                <div class="nav-item admin-only" style="display: none;">
+                    <i class="fas fa-bell"></i>
+                    <span>Notifications</span>
                 </div>
                 <div class="nav-item" id="navChangePassword">
                     <i class="fas fa-lock"></i>
@@ -87,68 +111,224 @@
 
             <!-- Page Content -->
             <div class="page-content">
-                <div class="dashboard-grid">
-                    <div class="card stat-card">
-                        <div class="stat-icon bg-blue">
-                            <i class="fas fa-users"></i>
+                <!-- Admin Dashboard UI -->
+                <div id="adminDashboard" style="display: none;">
+                    <!-- Admin Top Stats Grid -->
+                    <div class="dashboard-grid" style="grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));">
+                        <div class="card stat-card" style="padding: 16px;">
+                            <div class="stat-icon bg-blue" style="width: 48px; height: 48px; font-size: 1.2rem;">
+                                <i class="fas fa-users"></i>
+                            </div>
+                            <div class="stat-info">
+                                <h3>Total Students</h3>
+                                <p style="font-size: 1.25rem;">1,245</p>
+                            </div>
                         </div>
-                        <div class="stat-info">
-                            <h3>Total Students</h3>
-                            <p>1,245</p>
+                        <div class="card stat-card" style="padding: 16px;">
+                            <div class="stat-icon bg-emerald" style="width: 48px; height: 48px; font-size: 1.2rem;">
+                                <i class="fas fa-code-branch"></i>
+                            </div>
+                            <div class="stat-info">
+                                <h3>Total Branches</h3>
+                                <p style="font-size: 1.25rem;">6</p>
+                            </div>
+                        </div>
+                        <div class="card stat-card" style="padding: 16px;">
+                            <div class="stat-icon bg-orange" style="width: 48px; height: 48px; font-size: 1.2rem;">
+                                <i class="fas fa-book-open"></i>
+                            </div>
+                            <div class="stat-info">
+                                <h3>Total Subjects</h3>
+                                <p style="font-size: 1.25rem;">42</p>
+                            </div>
+                        </div>
+                        <div class="card stat-card" style="padding: 16px;">
+                            <div class="stat-icon" style="background: var(--text-secondary); width: 48px; height: 48px; font-size: 1.2rem;">
+                                <i class="fas fa-file-alt"></i>
+                            </div>
+                            <div class="stat-info">
+                                <h3>Total Notes</h3>
+                                <p style="font-size: 1.25rem;">156</p>
+                            </div>
+                        </div>
+                        <div class="card stat-card" style="padding: 16px;">
+                            <div class="stat-icon bg-blue" style="width: 48px; height: 48px; font-size: 1.2rem;">
+                                <i class="fas fa-file-pdf"></i>
+                            </div>
+                            <div class="stat-info">
+                                <h3>Total Papers</h3>
+                                <p style="font-size: 1.25rem;">89</p>
+                            </div>
+                        </div>
+                        <div class="card stat-card" style="padding: 16px;">
+                            <div class="stat-icon bg-orange" style="width: 48px; height: 48px; font-size: 1.2rem;">
+                                <i class="fas fa-bell"></i>
+                            </div>
+                            <div class="stat-info">
+                                <h3>Notifications</h3>
+                                <p style="font-size: 1.25rem;">12</p>
+                            </div>
+                        </div>
+                        <div class="card stat-card" style="padding: 16px;">
+                            <div class="stat-icon bg-emerald" style="width: 48px; height: 48px; font-size: 1.2rem;">
+                                <i class="fas fa-umbrella-beach"></i>
+                            </div>
+                            <div class="stat-info">
+                                <h3>Holidays</h3>
+                                <p style="font-size: 1.25rem;">15</p>
+                            </div>
                         </div>
                     </div>
-                    <div class="card stat-card">
-                        <div class="stat-icon bg-emerald">
-                            <i class="fas fa-chalkboard-teacher"></i>
+
+                    <div class="dashboard-columns">
+                        <!-- Fee Summary -->
+                        <div class="card">
+                            <h3 style="margin-bottom: 16px;"><i class="fas fa-file-invoice-dollar" style="color: var(--success-color);"></i> Fee Summary</h3>
+                            <div style="display: flex; gap: 24px; margin-bottom: 16px; flex-wrap: wrap;">
+                                <div style="flex: 1; min-width: 150px; padding: 16px; background: rgba(16, 185, 129, 0.1); border-radius: 8px; border: 1px solid rgba(16, 185, 129, 0.3);">
+                                    <h4 style="color: var(--text-secondary); font-size: 0.875rem;">Total Collected</h4>
+                                    <p style="font-size: 1.5rem; font-weight: 700; color: var(--success-color);">$1,245,000</p>
+                                </div>
+                                <div style="flex: 1; min-width: 150px; padding: 16px; background: rgba(239, 68, 68, 0.1); border-radius: 8px; border: 1px solid rgba(239, 68, 68, 0.3);">
+                                    <h4 style="color: var(--text-secondary); font-size: 0.875rem;">Total Pending</h4>
+                                    <p style="font-size: 1.5rem; font-weight: 700; color: var(--danger-color);">$152,000</p>
+                                </div>
+                            </div>
                         </div>
-                        <div class="stat-info">
-                            <h3>Active Teachers</h3>
-                            <p>84</p>
-                        </div>
-                    </div>
-                    <div class="card stat-card">
-                        <div class="stat-icon bg-orange">
-                            <i class="fas fa-book-open"></i>
-                        </div>
-                        <div class="stat-info">
-                            <h3>Total Courses</h3>
-                            <p>32</p>
+                        
+                        <!-- Attendance Summary -->
+                        <div class="card">
+                            <h3 style="margin-bottom: 16px;"><i class="fas fa-calendar-alt" style="color: var(--primary-light);"></i> Attendance Summary</h3>
+                            <div style="text-align: center; padding: 20px 0;">
+                                <div style="width: 120px; height: 120px; border-radius: 50%; border: 12px solid var(--success-color); border-top-color: var(--border-color); display: inline-flex; align-items: center; justify-content: center; font-size: 1.5rem; font-weight: 700; color: var(--text-primary); transform: rotate(45deg);">
+                                    <span style="transform: rotate(-45deg);">82%</span>
+                                </div>
+                                <p style="margin-top: 16px; color: var(--text-secondary); font-weight: 500;">Overall College Attendance</p>
+                            </div>
                         </div>
                     </div>
                 </div>
 
-                <!-- Recent Activity Table Placeholder -->
-                <div class="card" id="adminActivityCard" style="display: none;">
-                    <h3 style="margin-bottom: 20px;">Recent Registrations</h3>
-                    <div style="overflow-x: auto;">
-                        <table class="data-table">
-                            <thead>
-                                <tr>
-                                    <th>ID</th>
-                                    <th>Name</th>
-                                    <th>Course</th>
-                                    <th>Status</th>
-                                    <th>Date</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                <tr>
-                                    <td>#ST-001</td>
-                                    <td>John Doe</td>
-                                    <td>Computer Science</td>
-                                    <td><span style="color: var(--success-color); font-weight: 500;">Active</span></td>
-                                    <td>Oct 24, 2023</td>
-                                </tr>
-                            </tbody>
-                        </table>
+                <!-- Student Dashboard UI -->
+                <div id="studentDashboard" style="display: none;">
+                    <!-- Student Header -->
+                    <div class="card" style="margin-bottom: 24px;">
+                        <div class="student-profile-header">
+                            <div class="student-avatar">
+                                <i class="fas fa-user-graduate"></i>
+                            </div>
+                            <div class="student-details">
+                                <h2 id="displayStudentName">Student Name</h2>
+                                <div class="student-badges">
+                                    <span class="badge"><i class="fas fa-id-card"></i> Roll No: <span id="displayRollNumber">CS-2023-042</span></span>
+                                    <span class="badge"><i class="fas fa-code-branch"></i> Branch: Computer Science</span>
+                                    <span class="badge"><i class="fas fa-layer-group"></i> Semester: 5th</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Stats Row -->
+                    <div class="dashboard-grid">
+                        <div class="card stat-card">
+                            <div class="stat-icon bg-emerald">
+                                <i class="fas fa-calendar-check"></i>
+                            </div>
+                            <div class="stat-info">
+                                <h3>Attendance</h3>
+                                <p>85.4%</p>
+                            </div>
+                        </div>
+                        <div class="card stat-card">
+                            <div class="stat-icon bg-blue">
+                                <i class="fas fa-chart-line"></i>
+                            </div>
+                            <div class="stat-info">
+                                <h3>Latest SGPA</h3>
+                                <p>8.2</p>
+                            </div>
+                        </div>
+                        <div class="card stat-card">
+                            <div class="stat-icon bg-orange">
+                                <i class="fas fa-file-invoice-dollar"></i>
+                            </div>
+                            <div class="stat-info">
+                                <h3>Fee Status</h3>
+                                <p style="color: var(--success-color); font-size: 1.25rem;">Paid</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Main Columns -->
+                    <div class="dashboard-columns">
+                        <!-- Left Column -->
+                        <div>
+                            <div class="card" style="margin-bottom: 24px;">
+                                <h3 style="margin-bottom: 8px;">Quick Actions</h3>
+                                <div class="quick-actions-grid">
+                                    <div class="quick-action-btn">
+                                        <i class="fas fa-calendar-alt" style="color: var(--primary-light);"></i>
+                                        <span>Attendance</span>
+                                    </div>
+                                    <div class="quick-action-btn">
+                                        <i class="fas fa-graduation-cap" style="color: var(--info-color);"></i>
+                                        <span>View Marks</span>
+                                    </div>
+                                    <div class="quick-action-btn">
+                                        <i class="fas fa-file-download" style="color: var(--success-color);"></i>
+                                        <span>Download Notes</span>
+                                    </div>
+                                    <div class="quick-action-btn">
+                                        <i class="fas fa-file-pdf" style="color: var(--warning-color);"></i>
+                                        <span>Prev Papers</span>
+                                    </div>
+                                    <div class="quick-action-btn">
+                                        <i class="fas fa-receipt" style="color: var(--danger-color);"></i>
+                                        <span>Fee Details</span>
+                                    </div>
+                                    <div class="quick-action-btn">
+                                        <i class="fas fa-user-edit" style="color: var(--text-secondary);"></i>
+                                        <span>Profile</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Right Column -->
+                        <div>
+                            <!-- Notifications -->
+                            <div class="card" style="margin-bottom: 24px;">
+                                <h3 style="margin-bottom: 16px;"><i class="fas fa-bell" style="color: var(--warning-color);"></i> Notifications</h3>
+                                <ul style="list-style: none;">
+                                    <li style="padding-bottom: 12px; margin-bottom: 12px; border-bottom: 1px solid var(--border-color);">
+                                        <p style="font-size: 0.875rem; font-weight: 500;">Mid-Term Exam Schedule Released</p>
+                                        <span style="font-size: 0.75rem; color: var(--text-secondary);">2 hours ago</span>
+                                    </li>
+                                    <li style="padding-bottom: 12px; margin-bottom: 12px; border-bottom: 1px solid var(--border-color);">
+                                        <p style="font-size: 0.875rem; font-weight: 500;">Fee Submission Deadline Extended</p>
+                                        <span style="font-size: 0.75rem; color: var(--text-secondary);">1 day ago</span>
+                                    </li>
+                                </ul>
+                                <a href="#" style="font-size: 0.875rem; font-weight: 500;">View all notifications <i class="fas fa-arrow-right"></i></a>
+                            </div>
+
+                            <!-- Upcoming Holidays -->
+                            <div class="card">
+                                <h3 style="margin-bottom: 16px;"><i class="fas fa-umbrella-beach" style="color: var(--success-color);"></i> Holidays</h3>
+                                <ul style="list-style: none;">
+                                    <li style="display: flex; justify-content: space-between; padding-bottom: 8px; margin-bottom: 8px; border-bottom: 1px dashed var(--border-color);">
+                                        <span style="font-size: 0.875rem;">Diwali Break</span>
+                                        <span style="font-size: 0.875rem; font-weight: 600; color: var(--primary-color);">Oct 31</span>
+                                    </li>
+                                    <li style="display: flex; justify-content: space-between; padding-bottom: 8px;">
+                                        <span style="font-size: 0.875rem;">Winter Vacation</span>
+                                        <span style="font-size: 0.875rem; font-weight: 600; color: var(--primary-color);">Dec 25</span>
+                                    </li>
+                                </ul>
+                            </div>
+                        </div>
                     </div>
                 </div>
-
-                <div class="card" id="studentWelcomeCard" style="display: none;">
-                    <h3 style="margin-bottom: 20px;">Welcome to your Dashboard!</h3>
-                    <p style="color: var(--text-secondary);">Here you can view your courses, grades, and upcoming assignments.</p>
-                </div>
-            </div>
         </main>
     </div>
 
