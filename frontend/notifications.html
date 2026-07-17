@@ -124,56 +124,7 @@
 <body>
     <div class="app-container">
         <!-- Sidebar -->
-        <aside class="sidebar" id="sidebar">
-            <div class="sidebar-header">
-                <div class="logo">
-                    <i class="fas fa-graduation-cap logo-icon"></i>
-                    <span>CampusConnect</span>
-                </div>
-            </div>
-            <nav class="nav-menu">
-                <div class="nav-item" onclick="window.location.href='dashboard.html'">
-                    <i class="fas fa-chart-pie"></i>
-                    <span>Dashboard</span>
-                </div>
-                <div class="nav-item admin-only" onclick="window.location.href='students.html'">
-                    <i class="fas fa-user-graduate"></i>
-                    <span>Students</span>
-                </div>
-                <div class="nav-item admin-only" onclick="window.location.href='attendance.html'">
-                    <i class="fas fa-calendar-check"></i>
-                    <span>Attendance</span>
-                </div>
-                <div class="nav-item admin-only" onclick="window.location.href='marks.html'">
-                    <i class="fas fa-graduation-cap"></i>
-                    <span>Marks</span>
-                </div>
-                <div class="nav-item admin-only" onclick="window.location.href='fees.html'">
-                    <i class="fas fa-file-invoice-dollar"></i>
-                    <span>Fees</span>
-                </div>
-                <div class="nav-item admin-only" onclick="window.location.href='notes.html'">
-                    <i class="fas fa-book"></i>
-                    <span>Notes</span>
-                </div>
-                <div class="nav-item admin-only" onclick="window.location.href='papers.html'">
-                    <i class="fas fa-file-pdf"></i>
-                    <span>Prev Papers</span>
-                </div>
-                <div class="nav-item admin-only" onclick="window.location.href='syllabus.html'">
-                    <i class="fas fa-list-alt"></i>
-                    <span>Syllabus</span>
-                </div>
-                <div class="nav-item admin-only" onclick="window.location.href='holidays.html'">
-                    <i class="fas fa-umbrella-beach"></i>
-                    <span>Holidays</span>
-                </div>
-                <div class="nav-item active admin-only">
-                    <i class="fas fa-bell"></i>
-                    <span>Announcements</span>
-                </div>
-            </nav>
-        </aside>
+        <aside class="sidebar" id="sidebar"></aside>
 
         <!-- Main Content -->
         <main class="main-content">
@@ -244,5 +195,7 @@
     <script src="js/theme.js"></script>
     <script src="js/api.js"></script>
     <script src="js/notifications.js"></script>
+    <script src="js/sidebar.js"></script>
+    <script src="js/router.js"></script>
 </body>
 </html>

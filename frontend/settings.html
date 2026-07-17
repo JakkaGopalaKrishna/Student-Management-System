@@ -183,27 +183,7 @@
 <body>
     <div class="app-container">
         <!-- Sidebar -->
-        <aside class="sidebar" id="sidebar">
-            <div class="sidebar-header">
-                <div class="logo">
-                    <i class="fas fa-graduation-cap logo-icon"></i>
-                    <span>CampusConnect</span>
-                </div>
-            </div>
-            <nav class="nav-menu">
-                <div class="nav-item" onclick="window.location.href='dashboard.html'">
-                    <i class="fas fa-chart-pie"></i>
-                    <span>Dashboard</span>
-                </div>
-                
-                <!-- Settings specifically doesn't need to duplicate the entire sidebar for every module here, 
-                     but we'll provide a prominent return button in the layout -->
-                <div class="nav-item active">
-                    <i class="fas fa-cog"></i>
-                    <span>Settings</span>
-                </div>
-            </nav>
-        </aside>
+        <aside class="sidebar" id="sidebar"></aside>
 
         <!-- Main Content -->
         <main class="main-content">
@@ -420,5 +400,7 @@
     <script src="js/theme.js"></script>
     <script src="js/api.js"></script>
     <script src="js/settings.js"></script>
+    <script src="js/sidebar.js"></script>
+    <script src="js/router.js"></script>
 </body>
 </html>
