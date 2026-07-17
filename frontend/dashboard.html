@@ -54,15 +54,27 @@
                     <i class="fas fa-book"></i>
                     <span>Notes</span>
                 </div>
-                <div class="nav-item admin-only" style="display: none;">
+                <div class="nav-item admin-only" style="display: none;" onclick="window.location.href='papers.html'">
                     <i class="fas fa-file-pdf"></i>
-                    <span>Previous Papers</span>
+                    <span>Prev Papers</span>
                 </div>
-                <div class="nav-item admin-only" style="display: none;">
+                <div class="nav-item admin-only" style="display: none;" onclick="window.location.href='syllabus.html'">
+                    <i class="fas fa-list-alt"></i>
+                    <span>Syllabus</span>
+                </div>
+                <div class="nav-item admin-only" style="display: none;" onclick="window.location.href='timetable.html'">
+                    <i class="fas fa-clock"></i>
+                    <span>Timetable</span>
+                </div>
+                <div class="nav-item admin-only" style="display: none;" onclick="window.location.href='holidays.html'">
                     <i class="fas fa-umbrella-beach"></i>
                     <span>Holidays</span>
                 </div>
-                <div class="nav-item admin-only" style="display: none;">
+                <div class="nav-item admin-only" style="display: none;" onclick="window.location.href='notifications.html'">
+                    <i class="fas fa-bell"></i>
+                    <span>Announcements</span>
+                </div>
+                <div class="nav-item student-only" style="display: none;" onclick="window.location.href='student-notifications.html'">
                     <i class="fas fa-bell"></i>
                     <span>Notifications</span>
                 </div>
@@ -88,12 +100,13 @@
                     <h2 style="font-size: 1.25rem;">Overview</h2>
                 </div>
                 <div class="nav-actions">
-                    <button id="themeToggleBtn" class="btn-icon">
-                        <i class="fas fa-moon"></i>
-                    </button>
-                    <button class="btn-icon">
-                        <i class="fas fa-bell"></i>
-                    </button>
+                    <button id="themeToggleBtn" class="btn-icon"><i class="fas fa-moon"></i></button>
+                    
+                    <div class="student-only" style="position: relative; display: none; cursor: pointer;" onclick="window.location.href='student-notifications.html'">
+                        <button class="btn-icon"><i class="fas fa-bell"></i></button>
+                        <span id="navUnreadBadge" style="display:none; position: absolute; top: 0; right: 0; background: var(--danger-color); color: white; border-radius: 50%; width: 18px; height: 18px; font-size: 10px; font-weight: bold; align-items: center; justify-content: center;"></span>
+                    </div>
+
                     <div style="display: flex; align-items: center; gap: 12px; margin-left: 12px; padding-left: 12px; border-left: 1px solid var(--border-color);">
                         <div style="text-align: right; display: flex; flex-direction: column;">
                             <span id="userName" style="font-weight: 600; font-size: 0.875rem;">Loading...</span>
@@ -278,15 +291,27 @@
                                         <i class="fas fa-download" style="color: var(--success-color);"></i>
                                         <span>Notes</span>
                                     </div>
-                                    <div class="quick-action-btn">
+                                    <div class="quick-action-btn" onclick="window.location.href='student-papers.html'">
                                         <i class="fas fa-file-pdf" style="color: var(--warning-color);"></i>
                                         <span>Prev Papers</span>
+                                    </div>
+                                    <div class="quick-action-btn" onclick="window.location.href='student-syllabus.html'">
+                                        <i class="fas fa-list-alt" style="color: var(--info-color);"></i>
+                                        <span>Syllabus</span>
+                                    </div>
+                                    <div class="quick-action-btn" onclick="window.location.href='student-timetable.html'">
+                                        <i class="fas fa-clock" style="color: var(--primary-color);"></i>
+                                        <span>Timetable</span>
                                     </div>
                                     <div class="quick-action-btn" onclick="window.location.href='student-fees.html'">
                                         <i class="fas fa-receipt" style="color: var(--danger-color);"></i>
                                         <span>Fee Details</span>
                                     </div>
-                                    <div class="quick-action-btn">
+                                    <div class="quick-action-btn" onclick="window.location.href='student-holidays.html'">
+                                        <i class="fas fa-umbrella-beach" style="color: var(--warning-color);"></i>
+                                        <span>Upcoming Holidays</span>
+                                    </div>
+                                    <div class="quick-action-btn" onclick="window.location.href='student-profile.html'">
                                         <i class="fas fa-user-edit" style="color: var(--text-secondary);"></i>
                                         <span>Profile</span>
                                     </div>

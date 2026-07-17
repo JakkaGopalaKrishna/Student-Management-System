@@ -1,0 +1,213 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Curriculum Syllabus - Campus Connect</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="css/variables.css">
+    <link rel="stylesheet" href="css/layout.css">
+    <link rel="stylesheet" href="css/components.css">
+    <style>
+        .filter-bar {
+            display: flex;
+            gap: 16px;
+            margin-bottom: 24px;
+            flex-wrap: wrap;
+            align-items: flex-end;
+            background: var(--bg-color);
+            padding: 16px;
+            border-radius: 8px;
+            border: 1px solid var(--border-color);
+        }
+        .filter-item {
+            flex: 1;
+            min-width: 150px;
+        }
+        
+        .syllabus-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 24px;
+        }
+
+        .syllabus-card {
+            background: var(--bg-color);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            overflow: hidden;
+            transition: transform 0.2s, box-shadow 0.2s;
+            display: flex;
+            flex-direction: column;
+            position: relative;
+        }
+
+        .syllabus-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+        }
+
+        .syllabus-header {
+            padding: 16px;
+            background: rgba(16, 185, 129, 0.05); /* slightly green tint */
+            border-bottom: 1px solid var(--border-color);
+            display: flex;
+            align-items: flex-start;
+            gap: 12px;
+        }
+
+        .syllabus-icon {
+            font-size: 2rem;
+            color: var(--success-color);
+        }
+
+        .syllabus-title {
+            margin: 0 0 4px 0;
+            font-size: 1.1rem;
+            color: var(--text-primary);
+        }
+
+        .syllabus-body {
+            padding: 16px;
+            flex-grow: 1;
+        }
+
+        .syllabus-meta {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 0.875rem;
+            color: var(--text-secondary);
+            margin-bottom: 8px;
+        }
+
+        .syllabus-actions {
+            padding: 16px;
+            border-top: 1px solid var(--border-color);
+            display: flex;
+            gap: 8px;
+        }
+
+        .btn-full {
+            flex: 1;
+            justify-content: center;
+        }
+    </style>
+</head>
+<body>
+    <div class="app-container">
+        <!-- Sidebar -->
+        <aside class="sidebar" id="sidebar">
+            <div class="sidebar-header">
+                <div class="logo">
+                    <i class="fas fa-graduation-cap logo-icon"></i>
+                    <span>CampusConnect</span>
+                </div>
+            </div>
+            <nav class="nav-menu">
+                <div class="nav-item" onclick="window.location.href='dashboard.html'">
+                    <i class="fas fa-chart-pie"></i>
+                    <span>Dashboard</span>
+                </div>
+                <div class="nav-item" onclick="window.location.href='student-attendance.html'">
+                    <i class="fas fa-calendar-check"></i>
+                    <span>My Attendance</span>
+                </div>
+                <div class="nav-item" onclick="window.location.href='student-marks.html'">
+                    <i class="fas fa-graduation-cap"></i>
+                    <span>My Marks</span>
+                </div>
+                <div class="nav-item" onclick="window.location.href='student-fees.html'">
+                    <i class="fas fa-file-invoice-dollar"></i>
+                    <span>Fee Details</span>
+                </div>
+                <div class="nav-item" onclick="window.location.href='student-notes.html'">
+                    <i class="fas fa-book-open"></i>
+                    <span>Digital Library</span>
+                </div>
+                <div class="nav-item" onclick="window.location.href='student-papers.html'">
+                    <i class="fas fa-file-pdf"></i>
+                    <span>Previous Papers</span>
+                </div>
+                <div class="nav-item active">
+                    <i class="fas fa-list-alt"></i>
+                    <span>Syllabus</span>
+                </div>
+            </nav>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <header class="top-nav">
+                <div class="nav-actions">
+                    <button class="btn-icon" id="menuToggle" style="display: none;"><i class="fas fa-bars"></i></button>
+                    <h2 style="font-size: 1.25rem;">Curriculum Syllabus</h2>
+                </div>
+                <div class="nav-actions">
+                    <button id="themeToggleBtn" class="btn-icon"><i class="fas fa-moon"></i></button>
+                    <button id="logoutBtn" class="btn-icon" title="Logout"><i class="fas fa-sign-out-alt"></i></button>
+                </div>
+            </header>
+
+            <div class="page-content">
+                
+                <div class="filter-bar">
+                    <div class="filter-item">
+                        <label class="form-label">Search Keyword</label>
+                        <input type="text" id="searchKeyword" class="form-control" placeholder="Search by title...">
+                    </div>
+                    <div class="filter-item">
+                        <label class="form-label">Branch</label>
+                        <select id="searchBranch" class="form-control">
+                            <option value="">All Branches</option>
+                            <option value="Computer Science">Computer Science</option>
+                            <option value="Mechanical">Mechanical</option>
+                            <option value="Electrical">Electrical</option>
+                            <option value="Civil">Civil</option>
+                        </select>
+                    </div>
+                    <div class="filter-item">
+                        <label class="form-label">Semester</label>
+                        <select id="searchSemester" class="form-control">
+                            <option value="">All Semesters</option>
+                            <option value="1st">1st Semester</option>
+                            <option value="2nd">2nd Semester</option>
+                            <option value="3rd">3rd Semester</option>
+                            <option value="4th">4th Semester</option>
+                            <option value="5th">5th Semester</option>
+                            <option value="6th">6th Semester</option>
+                        </select>
+                    </div>
+                    <button class="btn btn-primary" id="searchBtn" style="height: 42px;">
+                        <i class="fas fa-search"></i> Search
+                    </button>
+                </div>
+
+                <div id="loadingState" style="text-align: center; padding: 40px; color: var(--text-secondary); display: none;">
+                    <i class="fas fa-spinner fa-spin fa-2x"></i>
+                    <p>Loading curriculum...</p>
+                </div>
+
+                <div id="emptyState" style="text-align: center; padding: 40px; color: var(--text-secondary); display: none;">
+                    <i class="fas fa-list-alt fa-3x" style="margin-bottom: 16px; color: var(--border-color);"></i>
+                    <h3>No syllabus found</h3>
+                    <p>Try adjusting your search filters.</p>
+                </div>
+
+                <div class="syllabus-grid" id="syllabusContainer">
+                    <!-- Populated by JS -->
+                </div>
+
+            </div>
+        </main>
+    </div>
+
+    <!-- Scripts -->
+    <script src="js/theme.js"></script>
+    <script src="js/api.js"></script>
+    <script src="js/student-syllabus.js"></script>
+</body>
+</html>

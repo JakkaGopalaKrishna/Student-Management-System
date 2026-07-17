@@ -1,0 +1,197 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Notification Center - Campus Connect</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <link rel="stylesheet" href="css/variables.css">
+    <link rel="stylesheet" href="css/layout.css">
+    <link rel="stylesheet" href="css/components.css">
+    <style>
+        .page-layout {
+            max-width: 800px;
+            margin: 0 auto;
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+        }
+
+        .notification-card {
+            background: var(--bg-color);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.02);
+            transition: background 0.2s;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .notification-card.unread {
+            background: rgba(59, 130, 246, 0.03);
+            border-left: 4px solid var(--primary-color);
+        }
+
+        .notification-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .notification-title-group {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .notification-title {
+            font-size: 1.125rem;
+            font-weight: 600;
+            color: var(--text-primary);
+            margin: 0;
+        }
+
+        .notification-time {
+            font-size: 0.875rem;
+            color: var(--text-secondary);
+        }
+
+        .notification-message {
+            color: var(--text-secondary);
+            margin: 0;
+            line-height: 1.6;
+        }
+
+        .priority-badge {
+            padding: 4px 10px;
+            border-radius: 12px;
+            font-size: 0.75rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .priority-high { background: rgba(239, 68, 68, 0.1); color: var(--danger-color); }
+        .priority-medium { background: rgba(245, 158, 11, 0.1); color: var(--warning-color); }
+        .priority-low { background: rgba(16, 185, 129, 0.1); color: var(--success-color); }
+
+        .btn-mark-read {
+            align-self: flex-end;
+            font-size: 0.875rem;
+            color: var(--primary-color);
+            background: none;
+            border: none;
+            cursor: pointer;
+            padding: 4px 8px;
+            border-radius: 4px;
+        }
+        .btn-mark-read:hover {
+            background: rgba(59, 130, 246, 0.1);
+        }
+    </style>
+</head>
+<body>
+    <div class="app-container">
+        <!-- Sidebar -->
+        <aside class="sidebar" id="sidebar">
+            <div class="sidebar-header">
+                <div class="logo">
+                    <i class="fas fa-graduation-cap logo-icon"></i>
+                    <span>CampusConnect</span>
+                </div>
+            </div>
+            <nav class="nav-menu">
+                <div class="nav-item" onclick="window.location.href='dashboard.html'">
+                    <i class="fas fa-chart-pie"></i>
+                    <span>Dashboard</span>
+                </div>
+                <div class="nav-item" onclick="window.location.href='student-attendance.html'">
+                    <i class="fas fa-calendar-check"></i>
+                    <span>My Attendance</span>
+                </div>
+                <div class="nav-item" onclick="window.location.href='student-marks.html'">
+                    <i class="fas fa-graduation-cap"></i>
+                    <span>My Marks</span>
+                </div>
+                <div class="nav-item" onclick="window.location.href='student-fees.html'">
+                    <i class="fas fa-file-invoice-dollar"></i>
+                    <span>Fee Details</span>
+                </div>
+                <div class="nav-item" onclick="window.location.href='student-notes.html'">
+                    <i class="fas fa-book-open"></i>
+                    <span>Digital Library</span>
+                </div>
+                <div class="nav-item" onclick="window.location.href='student-papers.html'">
+                    <i class="fas fa-file-pdf"></i>
+                    <span>Previous Papers</span>
+                </div>
+                <div class="nav-item" onclick="window.location.href='student-syllabus.html'">
+                    <i class="fas fa-list-alt"></i>
+                    <span>Syllabus</span>
+                </div>
+                <div class="nav-item" onclick="window.location.href='student-holidays.html'">
+                    <i class="fas fa-umbrella-beach"></i>
+                    <span>Holidays</span>
+                </div>
+                <div class="nav-item active">
+                    <i class="fas fa-bell"></i>
+                    <span>Notifications</span>
+                </div>
+            </nav>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <header class="top-nav">
+                <div class="nav-actions">
+                    <button class="btn-icon" id="menuToggle" style="display: none;"><i class="fas fa-bars"></i></button>
+                    <h2 style="font-size: 1.25rem;">Notification Center</h2>
+                </div>
+                <div class="nav-actions">
+                    <button id="themeToggleBtn" class="btn-icon"><i class="fas fa-moon"></i></button>
+                    
+                    <!-- Notification Bell with Badge (Standardized nav item) -->
+                    <div style="position: relative; display: inline-block; cursor: pointer;">
+                        <button class="btn-icon"><i class="fas fa-bell"></i></button>
+                        <span id="navUnreadBadge" style="display:none; position: absolute; top: 0; right: 0; background: var(--danger-color); color: white; border-radius: 50%; width: 18px; height: 18px; font-size: 10px; font-weight: bold; align-items: center; justify-content: center;"></span>
+                    </div>
+
+                    <button id="logoutBtn" class="btn-icon" title="Logout"><i class="fas fa-sign-out-alt"></i></button>
+                </div>
+            </header>
+
+            <div class="page-content">
+                <div class="page-layout">
+                    
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
+                        <h3 style="margin: 0;">Latest Announcements</h3>
+                        <button class="btn btn-outline" id="markAllReadBtn" style="display: none;">
+                            <i class="fas fa-check-double"></i> Mark all as read
+                        </button>
+                    </div>
+
+                    <div id="notificationsList" style="display: flex; flex-direction: column; gap: 16px;">
+                        <div style="text-align: center; padding: 40px; color: var(--text-secondary);">
+                            <i class="fas fa-spinner fa-spin fa-2x"></i>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <!-- Scripts -->
+    <script src="js/theme.js"></script>
+    <script src="js/api.js"></script>
+    <script src="js/student-notifications.js"></script>
+</body>
+</html>

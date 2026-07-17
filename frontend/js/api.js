@@ -100,6 +100,13 @@ const studentsAPI = {
             method: 'DELETE'
         });
     },
+
+    updateMe: async (data) => {
+        return fetchAPI(`/students/me/profile`, {
+            method: 'PUT',
+            body: JSON.stringify(data)
+        });
+    },
     
     uploadPhoto: async (id, file) => {
         const token = localStorage.getItem('token');
@@ -291,6 +298,133 @@ const papersAPI = {
     
     delete: async (id) => {
         return fetchAPI(`/papers/${id}`, {
+            method: 'DELETE'
+        });
+    }
+};
+
+const syllabusAPI = {
+    getAll: async (branch = '', semester = '', search = '') => {
+        const params = new URLSearchParams();
+        if (branch) params.append('branch', branch);
+        if (semester) params.append('semester', semester);
+        if (search) params.append('search', search);
+        return fetchAPI(`/syllabus/?${params.toString()}`);
+    },
+    
+    upload: async (formData) => {
+        return fetchAPI('/syllabus/', {
+            method: 'POST',
+            body: formData
+        });
+    },
+    
+    update: async (id, data) => {
+        return fetchAPI(`/syllabus/${id}`, {
+            method: 'PUT',
+            body: JSON.stringify(data)
+        });
+    },
+    
+    delete: async (id) => {
+        return fetchAPI(`/syllabus/${id}`, {
+            method: 'DELETE'
+        });
+    }
+};
+
+const holidaysAPI = {
+    getAll: async (year = '', month = '') => {
+        const params = new URLSearchParams();
+        if (year) params.append('year', year);
+        if (month) params.append('month', month);
+        return fetchAPI(`/holidays/?${params.toString()}`);
+    },
+    
+    create: async (data) => {
+        return fetchAPI('/holidays/', {
+            method: 'POST',
+            body: JSON.stringify(data)
+        });
+    },
+    
+    update: async (id, data) => {
+        return fetchAPI(`/holidays/${id}`, {
+            method: 'PUT',
+            body: JSON.stringify(data)
+        });
+    },
+    
+    delete: async (id) => {
+        return fetchAPI(`/holidays/${id}`, {
+            method: 'DELETE'
+        });
+    }
+};
+
+const notificationsAPI = {
+    getAll: async () => {
+        return fetchAPI('/notifications/');
+    },
+    
+    create: async (data) => {
+        return fetchAPI('/notifications/', {
+            method: 'POST',
+            body: JSON.stringify(data)
+        });
+    },
+    
+    update: async (id, data) => {
+        return fetchAPI(`/notifications/${id}`, {
+            method: 'PUT',
+            body: JSON.stringify(data)
+        });
+    },
+    
+    delete: async (id) => {
+        return fetchAPI(`/notifications/${id}`, {
+            method: 'DELETE'
+        });
+    },
+
+    markAsRead: async (id) => {
+        return fetchAPI(`/notifications/${id}/read`, {
+            method: 'POST'
+        });
+    },
+
+    markAllAsRead: async () => {
+        return fetchAPI('/notifications/read-all', {
+            method: 'POST'
+        });
+    }
+};
+
+const timetableAPI = {
+    getAll: async (branch = '', semester = '', type = '') => {
+        const params = new URLSearchParams();
+        if (branch) params.append('branch', branch);
+        if (semester) params.append('semester', semester);
+        if (type) params.append('entry_type', type);
+        return fetchAPI(`/timetable/?${params.toString()}`);
+    },
+    
+    create: async (data) => {
+        return fetchAPI('/timetable/', {
+            method: 'POST',
+            body: JSON.stringify(data)
+        });
+    },
+    
+    update: async (id, data) => {
+        return fetchAPI(`/timetable/${id}`, {
+            method: 'PUT',
+            body: JSON.stringify(data)
+        });
+    },
+    
+    delete: async (id) => {
+        return fetchAPI(`/timetable/${id}`, {
             method: 'DELETE'
         });
     }

@@ -20,6 +20,11 @@ class StudentProfileUpdate(BaseModel):
     phone: Optional[str] = None
     address: Optional[str] = None
     parent_details: Optional[str] = None
+
+class StudentProfileSelfUpdate(BaseModel):
+    phone: Optional[str] = None
+    address: Optional[str] = None
+    parent_details: Optional[str] = None
     profile_photo: Optional[str] = None
 
 class StudentProfileResponse(StudentProfileBase):

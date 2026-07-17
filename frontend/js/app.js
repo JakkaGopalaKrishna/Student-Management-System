@@ -27,6 +27,24 @@ document.addEventListener('DOMContentLoaded', async () => {
         } else {
             document.getElementById('studentDashboard').style.display = 'block';
             document.getElementById('displayStudentName').textContent = currentUser.full_name;
+
+            // Show student-only elements (like notification bell)
+            document.querySelectorAll('.student-only').forEach(el => {
+                el.style.display = 'flex'; // or block depending on original, let's use default empty or flex
+            });
+
+            // Fetch notifications
+            try {
+                const notifications = await notificationsAPI.getAll();
+                const unreadCount = notifications.filter(n => !n.is_read).length;
+                const badge = document.getElementById('navUnreadBadge');
+                if (badge && unreadCount > 0) {
+                    badge.textContent = unreadCount > 99 ? '99+' : unreadCount;
+                    badge.style.display = 'flex';
+                }
+            } catch (error) {
+                console.error('Failed to load notifications', error);
+            }
         }
     } catch (error) {
         console.error('Failed to load user session');

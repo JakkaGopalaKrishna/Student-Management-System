@@ -6,7 +6,7 @@ from sqlalchemy.orm import Session
 from app.api import deps
 from app.models.user import User, UserRole
 from app.models.student import StudentProfile
-from app.schemas.student import StudentCreate, StudentResponse, StudentProfileUpdate
+from app.schemas.student import StudentCreate, StudentResponse, StudentProfileUpdate, StudentProfileSelfUpdate
 from app.core import security
 
 router = APIRouter()
@@ -129,6 +129,33 @@ def update_student(
         db.refresh(user)
         
     return user
+
+@router.put("/me/profile", response_model=StudentResponse)
+def update_my_profile(
+    *,
+    db: Session = Depends(deps.get_db),
+    profile_in: StudentProfileSelfUpdate,
+    current_user: User = Depends(deps.get_current_active_user),
+) -> Any:
+    """
+    Update own profile (Student only).
+    """
+    if current_user.role != UserRole.STUDENT:
+        raise HTTPException(status_code=403, detail="Only students can update their profile here")
+
+    profile = current_user.student_profile
+    if not profile:
+        raise HTTPException(status_code=404, detail="Student profile not found")
+
+    update_data = profile_in.model_dump(exclude_unset=True)
+    for field, value in update_data.items():
+        setattr(profile, field, value)
+        
+    db.add(profile)
+    db.commit()
+    db.refresh(current_user)
+    
+    return current_user
 
 @router.delete("/{user_id}")
 def delete_student(
