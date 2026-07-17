@@ -1,4 +1,5 @@
 from sqlalchemy import Column, Integer, String, Boolean, Enum, DateTime
+from sqlalchemy.orm import relationship
 from app.core.database import Base
 import enum
 
@@ -17,3 +18,7 @@ class User(Base):
     is_active = Column(Boolean, default=True)
     reset_password_token = Column(String(255), nullable=True, index=True)
     reset_password_expire = Column(DateTime, nullable=True)
+
+    # Relationships
+    student_profile = relationship("StudentProfile", back_populates="user", uselist=False, cascade="all, delete-orphan")
+    attendance_records = relationship("Attendance", back_populates="student", cascade="all, delete-orphan")

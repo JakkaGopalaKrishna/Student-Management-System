@@ -65,3 +65,92 @@ const authAPI = {
     }),
     getMe: () => fetchAPI('/auth/me'),
 };
+
+const studentsAPI = {
+    getAll: async (search = '', branch = '', semester = '') => {
+        const params = new URLSearchParams();
+        if (search) params.append('search', search);
+        if (branch) params.append('branch', branch);
+        if (semester) params.append('semester', semester);
+        return fetchAPI(`/students/?${params.toString()}`);
+    },
+    
+    getById: async (id) => {
+        return fetchAPI(`/students/${id}`);
+    },
+    
+    create: async (data) => {
+        return fetchAPI('/students/', {
+            method: 'POST',
+            body: JSON.stringify(data)
+        });
+    },
+    
+    update: async (id, data) => {
+        return fetchAPI(`/students/${id}`, {
+            method: 'PUT',
+            body: JSON.stringify(data)
+        });
+    },
+    
+    delete: async (id) => {
+        return fetchAPI(`/students/${id}`, {
+            method: 'DELETE'
+        });
+    },
+    
+    uploadPhoto: async (id, file) => {
+        const token = localStorage.getItem('token');
+        const formData = new FormData();
+        formData.append('file', file);
+        
+        const response = await fetch(`${BASE_URL}/students/${id}/photo`, {
+            method: 'POST',
+            headers: {
+                'Authorization': `Bearer ${token}`
+                // Note: Don't set Content-Type here, browser sets it with boundaries for FormData
+            },
+            body: formData
+        });
+        
+        const data = await response.json();
+        if (!response.ok) {
+            throw new Error(data.detail || 'Photo upload failed');
+        }
+        return data;
+    }
+};
+
+const attendanceAPI = {
+    getAll: async (student_id = '', subject = '', target_date = '') => {
+        const params = new URLSearchParams();
+        if (student_id) params.append('student_id', student_id);
+        if (subject) params.append('subject', subject);
+        if (target_date) params.append('target_date', target_date);
+        return fetchAPI(`/attendance/?${params.toString()}`);
+    },
+    
+    createBulk: async (data) => {
+        return fetchAPI('/attendance/bulk', {
+            method: 'POST',
+            body: JSON.stringify(data)
+        });
+    },
+    
+    update: async (id, data) => {
+        return fetchAPI(`/attendance/${id}`, {
+            method: 'PUT',
+            body: JSON.stringify(data)
+        });
+    },
+    
+    delete: async (id) => {
+        return fetchAPI(`/attendance/${id}`, {
+            method: 'DELETE'
+        });
+    },
+    
+    getStats: async () => {
+        return fetchAPI('/attendance/me/stats');
+    }
+};

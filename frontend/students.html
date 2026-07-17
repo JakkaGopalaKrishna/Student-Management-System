@@ -1,0 +1,306 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Student Management - Campus Connect</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="css/variables.css">
+    <link rel="stylesheet" href="css/layout.css">
+    <link rel="stylesheet" href="css/components.css">
+    <style>
+        .filter-bar {
+            display: flex;
+            gap: 16px;
+            margin-bottom: 24px;
+            flex-wrap: wrap;
+            align-items: center;
+        }
+        .filter-bar .form-control {
+            width: auto;
+            min-width: 200px;
+        }
+        .modal {
+            display: none;
+            position: fixed;
+            inset: 0;
+            background: rgba(0,0,0,0.5);
+            z-index: 1000;
+            align-items: center;
+            justify-content: center;
+            backdrop-filter: blur(4px);
+        }
+        .modal-content {
+            width: 100%;
+            max-width: 600px;
+            max-height: 90vh;
+            overflow-y: auto;
+            margin: 20px;
+            position: relative;
+        }
+        .modal-close {
+            position: absolute;
+            top: 24px;
+            right: 24px;
+            background: none;
+            border: none;
+            font-size: 1.25rem;
+            color: var(--text-secondary);
+            cursor: pointer;
+        }
+        .grid-2 {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 16px;
+        }
+        .action-btns {
+            display: flex;
+            gap: 8px;
+        }
+        .action-btns button {
+            width: 32px;
+            height: 32px;
+            border-radius: 6px;
+            border: none;
+            cursor: pointer;
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: opacity 0.2s;
+        }
+        .action-btns button:hover { opacity: 0.8; }
+        .btn-view { background: var(--info-color); }
+        .btn-edit { background: var(--warning-color); }
+        .btn-delete { background: var(--danger-color); }
+        .photo-upload-wrapper {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 20px;
+        }
+        .photo-preview {
+            width: 100px;
+            height: 100px;
+            border-radius: 50%;
+            object-fit: cover;
+            background: var(--bg-color);
+            border: 2px dashed var(--border-color);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 2rem;
+            color: var(--text-muted);
+            overflow: hidden;
+        }
+    </style>
+</head>
+<body>
+    <div class="app-container">
+        <!-- Sidebar -->
+        <aside class="sidebar" id="sidebar">
+            <div class="sidebar-header">
+                <div class="logo">
+                    <i class="fas fa-graduation-cap logo-icon"></i>
+                    <span>CampusConnect</span>
+                </div>
+            </div>
+            <nav class="nav-menu">
+                <div class="nav-item" onclick="window.location.href='dashboard.html'">
+                    <i class="fas fa-chart-pie"></i>
+                    <span>Dashboard</span>
+                </div>
+                <div class="nav-item active admin-only">
+                    <i class="fas fa-user-graduate"></i>
+                    <span>Students</span>
+                </div>
+                <!-- Other items hidden for brevity on this page -->
+            </nav>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <header class="top-nav">
+                <div class="nav-actions">
+                    <button class="btn-icon" id="menuToggle" style="display: none;"><i class="fas fa-bars"></i></button>
+                    <h2 style="font-size: 1.25rem;">Student Management</h2>
+                </div>
+                <div class="nav-actions">
+                    <button id="themeToggleBtn" class="btn-icon"><i class="fas fa-moon"></i></button>
+                    <button class="btn-icon"><i class="fas fa-bell"></i></button>
+                    <div style="display: flex; align-items: center; gap: 12px; margin-left: 12px; padding-left: 12px; border-left: 1px solid var(--border-color);">
+                        <button id="logoutBtn" class="btn-icon" title="Logout"><i class="fas fa-sign-out-alt"></i></button>
+                    </div>
+                </div>
+            </header>
+
+            <div class="page-content">
+                <div class="card">
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px; flex-wrap: wrap; gap: 16px;">
+                        <h3 style="margin: 0;">Students Directory</h3>
+                        <button class="btn btn-primary" id="openAddModalBtn">
+                            <i class="fas fa-plus"></i> Add Student
+                        </button>
+                    </div>
+
+                    <div class="filter-bar">
+                        <input type="text" id="searchInput" class="form-control" placeholder="Search by name or email..." style="flex: 1;">
+                        <select id="branchFilter" class="form-control">
+                            <option value="">All Branches</option>
+                            <option value="Computer Science">Computer Science</option>
+                            <option value="Electrical Engineering">Electrical Engineering</option>
+                            <option value="Mechanical Engineering">Mechanical Engineering</option>
+                        </select>
+                        <select id="semesterFilter" class="form-control">
+                            <option value="">All Semesters</option>
+                            <option value="1st">1st Semester</option>
+                            <option value="2nd">2nd Semester</option>
+                            <option value="3rd">3rd Semester</option>
+                            <option value="4th">4th Semester</option>
+                            <option value="5th">5th Semester</option>
+                            <option value="6th">6th Semester</option>
+                        </select>
+                    </div>
+
+                    <div style="overflow-x: auto;">
+                        <table class="data-table" id="studentsTable">
+                            <thead>
+                                <tr>
+                                    <th>Roll Number</th>
+                                    <th>Name</th>
+                                    <th>Branch</th>
+                                    <th>Semester</th>
+                                    <th>Email</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody id="studentsTableBody">
+                                <!-- Populated by JS -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <!-- Add/Edit Student Modal -->
+    <div id="studentModal" class="modal">
+        <div class="card modal-content">
+            <button class="modal-close" onclick="closeStudentModal()"><i class="fas fa-times"></i></button>
+            <h3 id="modalTitle" style="margin-bottom: 24px;">Add New Student</h3>
+            
+            <div id="modalMessage" style="display: none; padding: 12px; border-radius: 8px; margin-bottom: 16px; font-size: 0.875rem;"></div>
+
+            <form id="studentForm">
+                <input type="hidden" id="studentId">
+                
+                <div class="photo-upload-wrapper">
+                    <div class="photo-preview" id="photoPreview">
+                        <i class="fas fa-user"></i>
+                    </div>
+                    <label class="btn" style="background: var(--bg-color); border: 1px solid var(--border-color); cursor: pointer;">
+                        <i class="fas fa-camera"></i> Upload Photo
+                        <input type="file" id="photoInput" accept="image/*" style="display: none;">
+                    </label>
+                </div>
+
+                <div class="grid-2">
+                    <div class="form-group">
+                        <label class="form-label">Full Name</label>
+                        <input type="text" id="stuName" class="form-control" required>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Email Address</label>
+                        <input type="email" id="stuEmail" class="form-control" required>
+                    </div>
+                    <div class="form-group" id="passwordGroup">
+                        <label class="form-label">Password</label>
+                        <input type="password" id="stuPassword" class="form-control" required>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Roll Number</label>
+                        <input type="text" id="stuRoll" class="form-control" required>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Branch</label>
+                        <select id="stuBranch" class="form-control" required>
+                            <option value="">Select Branch</option>
+                            <option value="Computer Science">Computer Science</option>
+                            <option value="Electrical Engineering">Electrical Engineering</option>
+                            <option value="Mechanical Engineering">Mechanical Engineering</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Semester</label>
+                        <select id="stuSemester" class="form-control" required>
+                            <option value="">Select Semester</option>
+                            <option value="1st">1st Semester</option>
+                            <option value="2nd">2nd Semester</option>
+                            <option value="3rd">3rd Semester</option>
+                            <option value="4th">4th Semester</option>
+                            <option value="5th">5th Semester</option>
+                            <option value="6th">6th Semester</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Phone Number</label>
+                        <input type="text" id="stuPhone" class="form-control">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Parent Details</label>
+                        <input type="text" id="stuParent" class="form-control">
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Address</label>
+                    <textarea id="stuAddress" class="form-control" rows="2"></textarea>
+                </div>
+                
+                <button type="submit" class="btn btn-primary" style="width: 100%; margin-top: 16px;">Save Student</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- View Profile Modal -->
+    <div id="viewModal" class="modal">
+        <div class="card modal-content">
+            <button class="modal-close" onclick="closeViewModal()"><i class="fas fa-times"></i></button>
+            <div class="student-profile-header" style="margin-bottom: 24px;">
+                <div class="photo-preview" id="viewPhoto" style="width: 120px; height: 120px;">
+                    <i class="fas fa-user"></i>
+                </div>
+                <div class="student-details">
+                    <h2 id="viewName">Student Name</h2>
+                    <p style="color: var(--text-secondary);" id="viewEmail">student@example.com</p>
+                    <div class="student-badges">
+                        <span class="badge"><i class="fas fa-id-card"></i> Roll No: <span id="viewRoll"></span></span>
+                        <span class="badge"><i class="fas fa-code-branch"></i> <span id="viewBranch"></span></span>
+                        <span class="badge"><i class="fas fa-layer-group"></i> <span id="viewSem"></span></span>
+                    </div>
+                </div>
+            </div>
+            <div class="grid-2">
+                <div class="card" style="padding: 16px; background: var(--bg-color); border: none; box-shadow: none;">
+                    <h4 style="color: var(--text-secondary); margin-bottom: 8px; font-size: 0.75rem; text-transform: uppercase;">Contact Information</h4>
+                    <p style="font-size: 0.875rem; margin-bottom: 4px;"><i class="fas fa-phone" style="width: 20px;"></i> <span id="viewPhone"></span></p>
+                    <p style="font-size: 0.875rem;"><i class="fas fa-map-marker-alt" style="width: 20px;"></i> <span id="viewAddress"></span></p>
+                </div>
+                <div class="card" style="padding: 16px; background: var(--bg-color); border: none; box-shadow: none;">
+                    <h4 style="color: var(--text-secondary); margin-bottom: 8px; font-size: 0.75rem; text-transform: uppercase;">Emergency Contact</h4>
+                    <p style="font-size: 0.875rem;"><i class="fas fa-users" style="width: 20px;"></i> <span id="viewParent"></span></p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Scripts -->
+    <script src="js/theme.js"></script>
+    <script src="js/api.js"></script>
+    <script src="js/students.js"></script>
+</body>
+</html>
