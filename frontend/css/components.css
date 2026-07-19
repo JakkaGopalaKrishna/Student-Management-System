@@ -277,3 +277,37 @@
     }
 }
 
+/* FullCalendar Overrides */
+.fc .fc-toolbar-title {
+    font-size: 1.5rem;
+    color: var(--text-primary);
+}
+
+.fc .fc-button-primary {
+    background-color: var(--bg-color) !important;
+    color: var(--text-primary) !important;
+    border-color: var(--border-color) !important;
+    text-transform: capitalize;
+    box-shadow: none !important;
+}
+
+.fc .fc-button-primary:hover {
+    background-color: var(--bg-hover) !important;
+    color: var(--text-primary) !important;
+}
+
+.fc .fc-button-primary:active,
+.fc .fc-button-primary.fc-button-active {
+    background-color: var(--primary-color) !important;
+    color: #ffffff !important;
+    border-color: var(--primary-color) !important;
+}
+
+.fc-theme-standard td, .fc-theme-standard th {
+    border-color: var(--border-color);
+}
+
+.fc-day-today {
+    background: rgba(59, 130, 246, 0.05) !important;
+}
+

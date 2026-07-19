@@ -80,6 +80,50 @@
             } catch (error) {
                 console.error('Failed to load notifications', error);
             }
+            
+            // If on dashboard, load stats
+            if (window.location.pathname.endsWith('/dashboard.html')) {
+                try {
+                    const [attStats, marksStats, feeStats] = await Promise.all([
+                        attendanceAPI.getStats().catch(() => null),
+                        marksAPI.getStats().catch(() => null),
+                        feesAPI.getStats().catch(() => null)
+                    ]);
+                    
+                    if (attStats) {
+                        const el = document.getElementById('student-stat-attendance');
+                        if (el) el.textContent = attStats.overall_percentage + '%';
+                    }
+                    
+                    if (marksStats && marksStats.semester_results && marksStats.semester_results.length > 0) {
+                        const el = document.getElementById('student-stat-sgpa');
+                        // Get latest SGPA
+                        const latest = marksStats.semester_results[marksStats.semester_results.length - 1].sgpa;
+                        if (el) el.textContent = latest;
+                    } else {
+                        const el = document.getElementById('student-stat-sgpa');
+                        if (el) el.textContent = 'N/A';
+                    }
+                    
+                    if (feeStats) {
+                        const el = document.getElementById('student-stat-fee');
+                        if (el) {
+                            if (feeStats.total_pending === 0 && feeStats.total_fees_demanded > 0) {
+                                el.textContent = 'Paid';
+                                el.style.color = 'var(--success-color)';
+                            } else if (feeStats.total_pending > 0) {
+                                el.textContent = 'Pending';
+                                el.style.color = 'var(--danger-color)';
+                            } else {
+                                el.textContent = 'No Fees';
+                                el.style.color = 'var(--text-secondary)';
+                            }
+                        }
+                    }
+                } catch (error) {
+                    console.error('Failed to load student stats', error);
+                }
+            }
         }
     } catch (error) {
         console.error('Failed to load user session');

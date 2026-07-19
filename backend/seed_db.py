@@ -12,6 +12,9 @@ from app.models.user import Student, Teacher, Admin
 from app.models.mark import Mark, ExamType
 from app.models.attendance import Attendance, AttendanceStatus
 from app.models.fee import Fee, FeeStatus
+from app.models.holiday import Holiday
+from app.models.timetable import TimetableEntry, EntryTypeEnum
+from datetime import time
 
 # Ensure tables are created
 Base.metadata.create_all(bind=engine)
@@ -79,10 +82,13 @@ def seed_data():
             
     db.commit()
 
+    # Fetch ALL students in the database to give them mock data
+    all_students = db.query(Student).all()
+    
     # 3. Add Marks, Attendance, and Fees for each student
     subjects = ["Data Structures", "Algorithms", "Operating Systems", "Database Systems"]
     
-    for student in students:
+    for student in all_students:
         # Add Marks
         if db.query(Mark).filter(Mark.student_id == student.id).count() == 0:
             for sub in subjects:
@@ -140,6 +146,57 @@ def seed_data():
             db.add(fee1)
 
     db.commit()
+    
+    # 4. Add Holidays / Events
+    if db.query(Holiday).count() == 0:
+        print("Adding holidays...")
+        today = date.today()
+        holidays = [
+            Holiday(title="New Year", date=date(today.year, 1, 1), description="New Year's Day Celebration"),
+            Holiday(title="Republic Day", date=date(today.year, 1, 26), description="Republic Day of India"),
+            Holiday(title="Holi Festival", date=date(today.year, 3, 25), description="Festival of Colors"),
+            Holiday(title="Summer Break Starts", date=date(today.year, 5, 1), description="Beginning of Summer Vacation"),
+            Holiday(title="Independence Day", date=date(today.year, 8, 15), description="Independence Day of India"),
+            Holiday(title="Diwali", date=date(today.year, 11, 1), description="Festival of Lights"),
+            Holiday(title="Christmas Break", date=date(today.year, 12, 25), description="Christmas Day Celebration"),
+        ]
+        
+        # Add a couple of holidays relative to current date so they show up easily in current month view
+        holidays.append(Holiday(title="Special Tech Event", date=today + timedelta(days=2), description="Campus Hackathon"))
+        holidays.append(Holiday(title="Mid-Term Break", date=today + timedelta(days=5), description="Mid-term relaxation day"))
+        
+        for h in holidays:
+            existing_h = db.query(Holiday).filter(Holiday.date == h.date).first()
+            if not existing_h:
+                db.add(h)
+        db.commit()
+
+    # 5. Add Timetable Data
+    if db.query(TimetableEntry).count() == 0:
+        print("Adding timetable...")
+        timetable_entries = [
+            # Monday
+            TimetableEntry(branch="Computer Science", semester="5th", entry_type=EntryTypeEnum.class_, subject="Data Structures", room="Room 101", start_time=time(9, 0), end_time=time(10, 0), day_of_week="Monday"),
+            TimetableEntry(branch="Computer Science", semester="5th", entry_type=EntryTypeEnum.class_, subject="Algorithms", room="Room 102", start_time=time(10, 0), end_time=time(11, 0), day_of_week="Monday"),
+            TimetableEntry(branch="Computer Science", semester="5th", entry_type=EntryTypeEnum.class_, subject="Operating Systems", room="Lab 3", start_time=time(11, 30), end_time=time(13, 30), day_of_week="Monday"),
+            
+            # Tuesday
+            TimetableEntry(branch="Computer Science", semester="5th", entry_type=EntryTypeEnum.class_, subject="Database Systems", room="Room 101", start_time=time(9, 0), end_time=time(10, 30), day_of_week="Tuesday"),
+            TimetableEntry(branch="Computer Science", semester="5th", entry_type=EntryTypeEnum.class_, subject="Data Structures", room="Room 101", start_time=time(10, 30), end_time=time(11, 30), day_of_week="Tuesday"),
+            TimetableEntry(branch="Computer Science", semester="5th", entry_type=EntryTypeEnum.class_, subject="Software Engineering", room="Room 205", start_time=time(12, 30), end_time=time(14, 0), day_of_week="Tuesday"),
+            
+            # Wednesday
+            TimetableEntry(branch="Computer Science", semester="5th", entry_type=EntryTypeEnum.class_, subject="Algorithms", room="Room 102", start_time=time(9, 0), end_time=time(10, 0), day_of_week="Wednesday"),
+            TimetableEntry(branch="Computer Science", semester="5th", entry_type=EntryTypeEnum.class_, subject="Database Systems", room="Lab 1", start_time=time(10, 0), end_time=time(12, 0), day_of_week="Wednesday"),
+            
+            # Upcoming Exam
+            TimetableEntry(branch="Computer Science", semester="5th", entry_type=EntryTypeEnum.exam, subject="Mid-Term: Operating Systems", room="Exam Hall A", start_time=time(10, 0), end_time=time(13, 0), exam_date=date.today() + timedelta(days=7))
+        ]
+        
+        for entry in timetable_entries:
+            db.add(entry)
+        db.commit()
+
     print("Database seeded successfully with dummy data! All passwords set to 'aditya@123'")
 
 if __name__ == "__main__":
