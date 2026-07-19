@@ -12,11 +12,11 @@ class Attendance(Base):
     __tablename__ = "attendance"
 
     id = Column(Integer, primary_key=True, index=True)
-    student_id = Column(Integer, ForeignKey("users.id"), nullable=False, index=True)
+    student_id = Column(Integer, ForeignKey("students.id"), nullable=False, index=True)
     date = Column(Date, nullable=False, index=True)
     subject = Column(String(100), nullable=False, index=True)
     status = Column(Enum(AttendanceStatus), nullable=False)
     remarks = Column(Text, nullable=True)
 
     # Relationships
-    student = relationship("User", back_populates="attendance_records")
+    student = relationship("Student", back_populates="attendance_records")

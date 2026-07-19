@@ -2,7 +2,7 @@ from typing import Any, List, Optional
 from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
 from app.api import deps
-from app.models.user import User, UserRole
+
 from app.models.timetable import TimetableEntry, EntryTypeEnum
 from app.schemas.timetable import TimetableEntryCreate, TimetableEntryUpdate, TimetableEntryResponse
 
@@ -11,7 +11,7 @@ router = APIRouter()
 @router.get("/", response_model=List[TimetableEntryResponse])
 def get_timetable(
     db: Session = Depends(deps.get_db),
-    current_user: User = Depends(deps.get_current_active_user),
+    current_user: Any = Depends(deps.get_current_active_user),
     branch: Optional[str] = None,
     semester: Optional[str] = None,
     entry_type: Optional[EntryTypeEnum] = None
@@ -37,12 +37,12 @@ def create_timetable_entry(
     *,
     db: Session = Depends(deps.get_db),
     entry_in: TimetableEntryCreate,
-    current_user: User = Depends(deps.get_current_active_user),
+    current_user: Any = Depends(deps.get_current_active_user),
 ) -> Any:
     """
     Create a new timetable entry (Admin only).
     """
-    if current_user.role != UserRole.ADMIN:
+    if current_user.role != "admin":
         raise HTTPException(status_code=403, detail="Not enough permissions")
 
     if entry_in.entry_type == EntryTypeEnum.class_ and not entry_in.day_of_week:
@@ -72,12 +72,12 @@ def update_timetable_entry(
     entry_id: int,
     db: Session = Depends(deps.get_db),
     entry_in: TimetableEntryUpdate,
-    current_user: User = Depends(deps.get_current_active_user),
+    current_user: Any = Depends(deps.get_current_active_user),
 ) -> Any:
     """
     Update timetable entry (Admin only).
     """
-    if current_user.role != UserRole.ADMIN:
+    if current_user.role != "admin":
         raise HTTPException(status_code=403, detail="Not enough permissions")
 
     record = db.query(TimetableEntry).filter(TimetableEntry.id == entry_id).first()
@@ -104,12 +104,12 @@ def delete_timetable_entry(
     *,
     entry_id: int,
     db: Session = Depends(deps.get_db),
-    current_user: User = Depends(deps.get_current_active_user),
+    current_user: Any = Depends(deps.get_current_active_user),
 ) -> Any:
     """
     Delete a timetable entry (Admin only).
     """
-    if current_user.role != UserRole.ADMIN:
+    if current_user.role != "admin":
         raise HTTPException(status_code=403, detail="Not enough permissions")
 
     record = db.query(TimetableEntry).filter(TimetableEntry.id == entry_id).first()

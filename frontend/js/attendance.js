@@ -1,8 +1,8 @@
-document.addEventListener('DOMContentLoaded', async () => {
+(async () => {
     // Auth Check
     const token = localStorage.getItem('token');
     if (!token) {
-        window.location.href = 'index.html';
+        window.location.href = '/index.html';
         return;
     }
 
@@ -10,12 +10,12 @@ document.addEventListener('DOMContentLoaded', async () => {
     try {
         currentUser = await authAPI.getMe();
         if (currentUser.role !== 'admin') {
-            window.location.href = 'dashboard.html';
+            window.location.href = '/dashboard.html';
             return;
         }
     } catch (error) {
         localStorage.removeItem('token');
-        window.location.href = 'index.html';
+        window.location.href = '/index.html';
     }
 
     // Default Date to Today
@@ -201,6 +201,6 @@ document.addEventListener('DOMContentLoaded', async () => {
     // Logout
     document.getElementById('logoutBtn').addEventListener('click', () => {
         localStorage.removeItem('token');
-        window.location.href = 'index.html';
+        window.location.href = '/index.html';
     });
-});
+})();

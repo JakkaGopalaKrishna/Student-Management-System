@@ -3,7 +3,7 @@ from fastapi import APIRouter, Depends, HTTPException, Query
 from sqlalchemy.orm import Session
 from sqlalchemy import extract, func
 from app.api import deps
-from app.models.user import User, UserRole
+
 from app.models.mark import Mark, ExamType
 from app.schemas.mark import (
     MarkCreate, MarkUpdate, MarkResponse, 
@@ -16,7 +16,7 @@ router = APIRouter()
 @router.get("/", response_model=List[MarkResponse])
 def get_marks(
     db: Session = Depends(deps.get_db),
-    current_user: User = Depends(deps.get_current_active_user),
+    current_user: Any = Depends(deps.get_current_active_user),
     student_id: Optional[int] = None,
     subject: Optional[str] = None,
     semester: Optional[str] = None,
@@ -27,7 +27,7 @@ def get_marks(
     """
     query = db.query(Mark)
     
-    if current_user.role == UserRole.STUDENT:
+    if current_user.role == "student":
         query = query.filter(Mark.student_id == current_user.id)
     else:
         if student_id:
@@ -47,12 +47,12 @@ def create_mark(
     *,
     db: Session = Depends(deps.get_db),
     mark_in: MarkCreate,
-    current_user: User = Depends(deps.get_current_active_user),
+    current_user: Any = Depends(deps.get_current_active_user),
 ) -> Any:
     """
     Create a new mark record (Admin only).
     """
-    if current_user.role != UserRole.ADMIN:
+    if current_user.role != "admin":
         raise HTTPException(status_code=403, detail="Not enough permissions")
 
     # Check for existing record
@@ -86,12 +86,12 @@ def update_mark(
     mark_id: int,
     db: Session = Depends(deps.get_db),
     mark_in: MarkUpdate,
-    current_user: User = Depends(deps.get_current_active_user),
+    current_user: Any = Depends(deps.get_current_active_user),
 ) -> Any:
     """
     Update a mark record (Admin only).
     """
-    if current_user.role != UserRole.ADMIN:
+    if current_user.role != "admin":
         raise HTTPException(status_code=403, detail="Not enough permissions")
 
     record = db.query(Mark).filter(Mark.id == mark_id).first()
@@ -115,12 +115,12 @@ def delete_mark(
     *,
     mark_id: int,
     db: Session = Depends(deps.get_db),
-    current_user: User = Depends(deps.get_current_active_user),
+    current_user: Any = Depends(deps.get_current_active_user),
 ) -> Any:
     """
     Delete a mark record (Admin only).
     """
-    if current_user.role != UserRole.ADMIN:
+    if current_user.role != "admin":
         raise HTTPException(status_code=403, detail="Not enough permissions")
 
     record = db.query(Mark).filter(Mark.id == mark_id).first()
@@ -134,12 +134,12 @@ def delete_mark(
 @router.get("/me/stats", response_model=StudentMarksStats)
 def get_marks_stats(
     db: Session = Depends(deps.get_db),
-    current_user: User = Depends(deps.get_current_active_user),
+    current_user: Any = Depends(deps.get_current_active_user),
 ) -> Any:
     """
     Get detailed marks statistics for the logged-in student.
     """
-    if current_user.role != UserRole.STUDENT:
+    if current_user.role != "student":
         raise HTTPException(status_code=403, detail="Only students can view their own stats")
 
     records = db.query(Mark).filter(Mark.student_id == current_user.id).all()

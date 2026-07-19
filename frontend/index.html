@@ -27,12 +27,32 @@
         }
         .auth-links {
             display: flex;
-            justify-content: space-between;
+            justify-content: center;
             margin-top: 16px;
             font-size: 0.875rem;
         }
         .auth-links a {
             cursor: pointer;
+        }
+        .login-tabs {
+            display: flex;
+            margin-bottom: 20px;
+            border-bottom: 2px solid var(--border-color);
+        }
+        .login-tab {
+            flex: 1;
+            text-align: center;
+            padding: 12px;
+            cursor: pointer;
+            font-weight: 500;
+            color: var(--text-secondary);
+            transition: all 0.2s;
+            border-bottom: 2px solid transparent;
+            margin-bottom: -2px;
+        }
+        .login-tab.active {
+            color: var(--primary-color);
+            border-bottom-color: var(--primary-color);
         }
     </style>
 </head>
@@ -51,7 +71,18 @@
 
             <!-- LOGIN FORM -->
             <div id="loginPanel" class="form-panel active">
+                
+                <div class="login-tabs">
+                    <div class="login-tab active" data-role="student" onclick="selectRole('student')">
+                        <i class="fas fa-user-graduate" style="margin-right: 6px;"></i> Student
+                    </div>
+                    <div class="login-tab" data-role="teacher" onclick="selectRole('teacher')">
+                        <i class="fas fa-chalkboard-teacher" style="margin-right: 6px;"></i> Teacher
+                    </div>
+                </div>
+
                 <form id="loginForm">
+                    <input type="hidden" id="loginRole" value="student">
                     <div class="form-group">
                         <label class="form-label" for="loginEmail">Email Address</label>
                         <input type="email" id="loginEmail" class="form-control" placeholder="Enter your email" required>
@@ -65,32 +96,6 @@
                     </button>
                     <div class="auth-links">
                         <a onclick="switchPanel('forgotPanel')">Forgot Password?</a>
-                        <a onclick="switchPanel('registerPanel')">Create Student Account</a>
-                    </div>
-                </form>
-            </div>
-
-            <!-- REGISTER FORM (STUDENT) -->
-            <div id="registerPanel" class="form-panel">
-                <h3 style="margin-bottom: 16px; text-align: center;">Student Registration</h3>
-                <form id="registerForm">
-                    <div class="form-group">
-                        <label class="form-label" for="regName">Full Name</label>
-                        <input type="text" id="regName" class="form-control" placeholder="John Doe" required>
-                    </div>
-                    <div class="form-group">
-                        <label class="form-label" for="regEmail">Email Address</label>
-                        <input type="email" id="regEmail" class="form-control" placeholder="student@example.com" required>
-                    </div>
-                    <div class="form-group">
-                        <label class="form-label" for="regPassword">Password</label>
-                        <input type="password" id="regPassword" class="form-control" placeholder="Create a password" required>
-                    </div>
-                    <button type="submit" class="btn btn-primary" style="width: 100%; margin-top: 10px; padding: 12px;">
-                        Register
-                    </button>
-                    <div class="auth-links" style="justify-content: center;">
-                        <span style="color: var(--text-secondary);">Already have an account? <a onclick="switchPanel('loginPanel')">Sign In</a></span>
                     </div>
                 </form>
             </div>
@@ -99,9 +104,16 @@
             <div id="forgotPanel" class="form-panel">
                 <h3 style="margin-bottom: 16px; text-align: center;">Reset Password</h3>
                 <p style="color: var(--text-secondary); font-size: 0.875rem; text-align: center; margin-bottom: 16px;">
-                    Enter your email and we'll send you a reset link.
+                    Enter your email and role. We'll send you a reset link.
                 </p>
                 <form id="forgotForm">
+                    <div class="form-group">
+                        <label class="form-label" for="forgotRole">I am a:</label>
+                        <select id="forgotRole" class="form-control" required>
+                            <option value="student">Student</option>
+                            <option value="teacher">Teacher</option>
+                        </select>
+                    </div>
                     <div class="form-group">
                         <label class="form-label" for="forgotEmail">Email Address</label>
                         <input type="email" id="forgotEmail" class="form-control" placeholder="Enter your email" required>
@@ -124,10 +136,9 @@
     </div>
 
     <!-- Scripts -->
-    <script src="js/theme.js"></script>
-    <script src="js/api.js"></script>
-    <script src="js/auth.js"></script>
-    <script src="js/sidebar.js"></script>
-    <script src="js/router.js"></script>
+    <script src="js/theme.js?v=2"></script>
+    <script src="js/api.js?v=2"></script>
+    <script src="js/auth.js?v=2"></script>
+    <script src="js/router.js?v=2"></script>
 </body>
 </html>

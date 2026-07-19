@@ -25,16 +25,32 @@ function showGlobalMessage(msg, type) {
     }
 }
 
-document.addEventListener('DOMContentLoaded', () => {
+// Handle Role Tab Switching
+function selectRole(role) {
+    document.querySelectorAll('.login-tab').forEach(tab => {
+        tab.classList.remove('active');
+    });
+    const activeTab = document.querySelector(`.login-tab[data-role="${role}"]`);
+    if(activeTab) {
+        activeTab.classList.add('active');
+    }
+    document.getElementById('loginRole').value = role;
+}
+
+(() => {
     // Check if already logged in
     const token = localStorage.getItem('token');
+    const storedRole = localStorage.getItem('role');
     if (token) {
-        window.location.href = 'dashboard.html';
+        if (storedRole === 'admin') {
+            window.location.href = '/admin/dashboard/index.html';
+        } else {
+            window.location.href = '/dashboard.html';
+        }
         return;
     }
 
     const loginForm = document.getElementById('loginForm');
-    const registerForm = document.getElementById('registerForm');
     const forgotForm = document.getElementById('forgotForm');
 
     // Login Handling
@@ -43,6 +59,7 @@ document.addEventListener('DOMContentLoaded', () => {
             e.preventDefault();
             const email = document.getElementById('loginEmail').value;
             const password = document.getElementById('loginPassword').value;
+            const role = document.getElementById('loginRole').value;
             const submitBtn = loginForm.querySelector('button[type="submit"]');
 
             try {
@@ -51,40 +68,18 @@ document.addEventListener('DOMContentLoaded', () => {
                 showGlobalMessage('', 'success'); // Clear
                 document.getElementById('globalMessage').style.display = 'none';
 
-                const data = await authAPI.login(email, password);
+                const data = await authAPI.login(email, password, role);
                 localStorage.setItem('token', data.access_token);
-                window.location.href = 'dashboard.html';
+                localStorage.setItem('role', role);
+                if (role === 'admin') {
+                    window.location.href = '/admin/dashboard/index.html';
+                } else {
+                    window.location.href = '/dashboard.html';
+                }
             } catch (error) {
                 showGlobalMessage(error.message, 'error');
                 submitBtn.disabled = false;
                 submitBtn.innerHTML = 'Sign In';
-            }
-        });
-    }
-
-    // Register Handling
-    if (registerForm) {
-        registerForm.addEventListener('submit', async (e) => {
-            e.preventDefault();
-            const name = document.getElementById('regName').value;
-            const email = document.getElementById('regEmail').value;
-            const password = document.getElementById('regPassword').value;
-            const submitBtn = registerForm.querySelector('button[type="submit"]');
-
-            try {
-                submitBtn.disabled = true;
-                submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Registering...';
-                document.getElementById('globalMessage').style.display = 'none';
-
-                await authAPI.register(name, email, password);
-                showGlobalMessage('Registration successful! You can now login.', 'success');
-                registerForm.reset();
-                switchPanel('loginPanel');
-            } catch (error) {
-                showGlobalMessage(error.message, 'error');
-            } finally {
-                submitBtn.disabled = false;
-                submitBtn.innerHTML = 'Register';
             }
         });
     }
@@ -94,6 +89,7 @@ document.addEventListener('DOMContentLoaded', () => {
         forgotForm.addEventListener('submit', async (e) => {
             e.preventDefault();
             const email = document.getElementById('forgotEmail').value;
+            const role = document.getElementById('forgotRole').value;
             const submitBtn = forgotForm.querySelector('button[type="submit"]');
 
             try {
@@ -101,7 +97,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Sending...';
                 document.getElementById('globalMessage').style.display = 'none';
 
-                const res = await authAPI.forgotPassword(email);
+                const res = await authAPI.forgotPassword(email, role);
                 showGlobalMessage(res.msg, 'success');
                 forgotForm.reset();
             } catch (error) {
@@ -112,4 +108,4 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         });
     }
-});
+})();

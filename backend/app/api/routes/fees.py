@@ -3,7 +3,7 @@ from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
 from datetime import date
 from app.api import deps
-from app.models.user import User, UserRole
+
 from app.models.fee import Fee, FeePayment, FeeStatus
 from app.schemas.fee import (
     FeeCreate, FeeUpdate, FeeResponse, 
@@ -15,7 +15,7 @@ router = APIRouter()
 @router.get("/", response_model=List[FeeResponse])
 def get_fees(
     db: Session = Depends(deps.get_db),
-    current_user: User = Depends(deps.get_current_active_user),
+    current_user: Any = Depends(deps.get_current_active_user),
     student_id: Optional[int] = None,
     status: Optional[str] = None,
 ) -> Any:
@@ -24,7 +24,7 @@ def get_fees(
     """
     query = db.query(Fee)
     
-    if current_user.role == UserRole.STUDENT:
+    if current_user.role == "student":
         query = query.filter(Fee.student_id == current_user.id)
     else:
         if student_id:
@@ -40,12 +40,12 @@ def create_fee(
     *,
     db: Session = Depends(deps.get_db),
     fee_in: FeeCreate,
-    current_user: User = Depends(deps.get_current_active_user),
+    current_user: Any = Depends(deps.get_current_active_user),
 ) -> Any:
     """
     Create a new fee demand (Admin only).
     """
-    if current_user.role != UserRole.ADMIN:
+    if current_user.role != "admin":
         raise HTTPException(status_code=403, detail="Not enough permissions")
 
     db_fee = Fee(
@@ -67,12 +67,12 @@ def update_fee(
     fee_id: int,
     db: Session = Depends(deps.get_db),
     fee_in: FeeUpdate,
-    current_user: User = Depends(deps.get_current_active_user),
+    current_user: Any = Depends(deps.get_current_active_user),
 ) -> Any:
     """
     Update a fee demand (Admin only). Cannot update if fully paid.
     """
-    if current_user.role != UserRole.ADMIN:
+    if current_user.role != "admin":
         raise HTTPException(status_code=403, detail="Not enough permissions")
 
     record = db.query(Fee).filter(Fee.id == fee_id).first()
@@ -109,12 +109,12 @@ def delete_fee(
     *,
     fee_id: int,
     db: Session = Depends(deps.get_db),
-    current_user: User = Depends(deps.get_current_active_user),
+    current_user: Any = Depends(deps.get_current_active_user),
 ) -> Any:
     """
     Delete a fee demand (Admin only). Also deletes associated payments (cascade).
     """
-    if current_user.role != UserRole.ADMIN:
+    if current_user.role != "admin":
         raise HTTPException(status_code=403, detail="Not enough permissions")
 
     record = db.query(Fee).filter(Fee.id == fee_id).first()
@@ -131,12 +131,12 @@ def record_payment(
     fee_id: int,
     db: Session = Depends(deps.get_db),
     payment_in: FeePaymentCreate,
-    current_user: User = Depends(deps.get_current_active_user),
+    current_user: Any = Depends(deps.get_current_active_user),
 ) -> Any:
     """
     Record a payment against a fee (Admin only).
     """
-    if current_user.role != UserRole.ADMIN:
+    if current_user.role != "admin":
         raise HTTPException(status_code=403, detail="Not enough permissions")
 
     fee = db.query(Fee).filter(Fee.id == fee_id).first()
@@ -174,12 +174,12 @@ def record_payment(
 @router.get("/me/stats", response_model=StudentFeeStats)
 def get_fee_stats(
     db: Session = Depends(deps.get_db),
-    current_user: User = Depends(deps.get_current_active_user),
+    current_user: Any = Depends(deps.get_current_active_user),
 ) -> Any:
     """
     Get aggregated fee statistics for the logged-in student.
     """
-    if current_user.role != UserRole.STUDENT:
+    if current_user.role != "student":
         raise HTTPException(status_code=403, detail="Only students can view their own stats")
 
     fees = db.query(Fee).filter(Fee.student_id == current_user.id).order_by(Fee.due_date.asc()).all()
@@ -210,7 +210,7 @@ def get_fee_stats(
 def get_receipt_data(
     payment_id: int,
     db: Session = Depends(deps.get_db),
-    current_user: User = Depends(deps.get_current_active_user),
+    current_user: Any = Depends(deps.get_current_active_user),
 ) -> Any:
     """
     Get data to generate a receipt for a specific payment.
@@ -222,7 +222,7 @@ def get_receipt_data(
     fee = payment.fee
     student = fee.student
     
-    if current_user.role == UserRole.STUDENT and student.id != current_user.id:
+    if current_user.role == "student" and student.id != current_user.id:
         raise HTTPException(status_code=403, detail="Not authorized to view this receipt")
         
     return {

@@ -2,8 +2,8 @@ from typing import Any
 from fastapi import APIRouter, Depends, Query
 from sqlalchemy.orm import Session
 from app.api import deps
-from app.models.user import User, UserRole
-from app.models.student import StudentProfile
+
+from app.models.user import Student
 from app.models.note import Note
 from app.models.paper import Paper
 from app.models.syllabus import Syllabus
@@ -16,7 +16,7 @@ router = APIRouter()
 def global_search(
     q: str = Query(..., min_length=2),
     db: Session = Depends(deps.get_db),
-    current_user: User = Depends(deps.get_current_active_user),
+    current_user: Any = Depends(deps.get_current_active_user),
 ) -> Any:
     """
     Search across multiple modules and return unified results.
@@ -26,19 +26,18 @@ def global_search(
     search_term = f"%{q}%"
 
     # 1. Search Students (Admin only)
-    if current_user.role == UserRole.ADMIN:
-        students = db.query(User).join(StudentProfile).filter(
-            User.role == UserRole.STUDENT,
-            (User.full_name.ilike(search_term) | 
-             StudentProfile.roll_number.ilike(search_term) |
-             User.email.ilike(search_term))
+    if current_user.role == "admin":
+        students = db.query(Student).filter(
+            (Student.name.ilike(search_term) | 
+             Student.roll_number.ilike(search_term) |
+             Student.email.ilike(search_term))
         ).limit(limit_per_category).all()
 
         for s in students:
             results.append(SearchResult(
                 type="student",
-                title=s.full_name,
-                subtitle=f"{s.student_profile.roll_number} • {s.student_profile.branch} ({s.student_profile.semester})",
+                title=s.name,
+                subtitle=f"{s.roll_number} • {s.department_branch} ({s.semester})",
                 link="students.html",
                 id=s.id
             ))
@@ -54,7 +53,7 @@ def global_search(
             type="note",
             title=n.title,
             subtitle=f"{n.subject} • {n.branch}",
-            link="student-notes.html" if current_user.role == UserRole.STUDENT else "notes.html",
+            link="student-notes.html" if current_user.role == "student" else "notes.html",
             id=n.id
         ))
 
@@ -69,21 +68,21 @@ def global_search(
             type="paper",
             title=p.title,
             subtitle=f"{p.subject} • {p.year}",
-            link="student-papers.html" if current_user.role == UserRole.STUDENT else "papers.html",
+            link="student-papers.html" if current_user.role == "student" else "papers.html",
             id=p.id
         ))
 
     # 4. Search Syllabus (Covers "Subjects" search as well)
     syllabus = db.query(Syllabus).filter(
-        Syllabus.subject.ilike(search_term)
+        Syllabus.title.ilike(search_term)
     ).limit(limit_per_category).all()
 
     for s in syllabus:
         results.append(SearchResult(
             type="syllabus",
-            title=s.subject,
+            title=s.title,
             subtitle=f"{s.branch} • {s.semester}",
-            link="student-syllabus.html" if current_user.role == UserRole.STUDENT else "syllabus.html",
+            link="student-syllabus.html" if current_user.role == "student" else "syllabus.html",
             id=s.id
         ))
 
@@ -98,7 +97,7 @@ def global_search(
             type="notification",
             title=n.title,
             subtitle=f"{n.priority.upper()} Priority",
-            link="student-notifications.html" if current_user.role == UserRole.STUDENT else "notifications.html",
+            link="student-notifications.html" if current_user.role == "student" else "notifications.html",
             id=n.id
         ))
 

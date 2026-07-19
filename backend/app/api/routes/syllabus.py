@@ -5,7 +5,7 @@ from typing import Any, List, Optional
 from fastapi import APIRouter, Depends, HTTPException, UploadFile, File, Form
 from sqlalchemy.orm import Session
 from app.api import deps
-from app.models.user import User, UserRole
+
 from app.models.syllabus import Syllabus
 from app.schemas.syllabus import SyllabusResponse, SyllabusUpdate
 
@@ -17,7 +17,7 @@ os.makedirs(UPLOAD_DIR, exist_ok=True)
 @router.get("/", response_model=List[SyllabusResponse])
 def get_syllabus(
     db: Session = Depends(deps.get_db),
-    current_user: User = Depends(deps.get_current_active_user),
+    current_user: Any = Depends(deps.get_current_active_user),
     branch: Optional[str] = None,
     semester: Optional[str] = None,
     search: Optional[str] = None,
@@ -43,12 +43,12 @@ async def upload_syllabus(
     semester: str = Form(...),
     file: UploadFile = File(...),
     db: Session = Depends(deps.get_db),
-    current_user: User = Depends(deps.get_current_active_user),
+    current_user: Any = Depends(deps.get_current_active_user),
 ) -> Any:
     """
     Upload a new syllabus (Admin only).
     """
-    if current_user.role != UserRole.ADMIN:
+    if current_user.role != "admin":
         raise HTTPException(status_code=403, detail="Not enough permissions")
 
     if not file.filename.endswith(".pdf"):
@@ -85,12 +85,12 @@ def update_syllabus(
     syllabus_id: int,
     db: Session = Depends(deps.get_db),
     syllabus_in: SyllabusUpdate,
-    current_user: User = Depends(deps.get_current_active_user),
+    current_user: Any = Depends(deps.get_current_active_user),
 ) -> Any:
     """
     Update syllabus metadata (Admin only).
     """
-    if current_user.role != UserRole.ADMIN:
+    if current_user.role != "admin":
         raise HTTPException(status_code=403, detail="Not enough permissions")
 
     record = db.query(Syllabus).filter(Syllabus.id == syllabus_id).first()
@@ -114,12 +114,12 @@ def delete_syllabus(
     *,
     syllabus_id: int,
     db: Session = Depends(deps.get_db),
-    current_user: User = Depends(deps.get_current_active_user),
+    current_user: Any = Depends(deps.get_current_active_user),
 ) -> Any:
     """
     Delete a syllabus and its file (Admin only).
     """
-    if current_user.role != UserRole.ADMIN:
+    if current_user.role != "admin":
         raise HTTPException(status_code=403, detail="Not enough permissions")
 
     record = db.query(Syllabus).filter(Syllabus.id == syllabus_id).first()

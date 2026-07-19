@@ -22,10 +22,10 @@ const updateThemeIcon = (theme) => {
     }
 };
 
-document.addEventListener('DOMContentLoaded', () => {
+(() => {
     initTheme();
     const themeBtn = document.getElementById('themeToggleBtn');
     if (themeBtn) {
         themeBtn.addEventListener('click', toggleTheme);
     }
-});
+})();

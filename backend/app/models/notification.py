@@ -22,9 +22,9 @@ class NotificationRead(Base):
     __tablename__ = "notification_reads"
 
     id = Column(Integer, primary_key=True, index=True)
-    student_id = Column(Integer, ForeignKey("users.id"), nullable=False, index=True)
+    student_id = Column(Integer, ForeignKey("students.id"), nullable=False, index=True)
     notification_id = Column(Integer, ForeignKey("notifications.id"), nullable=False, index=True)
     read_at = Column(DateTime, default=datetime.utcnow, nullable=False)
 
-    student = relationship("User")
+    student = relationship("Student")
     notification = relationship("Notification")

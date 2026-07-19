@@ -1,0 +1,406 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Settings - Campus Connect</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <link rel="stylesheet" href="../../css/variables.css">
+    <link rel="stylesheet" href="../../css/layout.css">
+    <link rel="stylesheet" href="../../css/components.css">
+    <style>
+        .settings-layout {
+            display: grid;
+            grid-template-columns: 280px 1fr;
+            gap: 24px;
+            align-items: start;
+        }
+
+        @media (max-width: 900px) {
+            .settings-layout {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .settings-menu {
+            background: var(--bg-color);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.02);
+            position: sticky;
+            top: 24px;
+        }
+
+        .settings-nav-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 16px 20px;
+            color: var(--text-secondary);
+            font-weight: 500;
+            cursor: pointer;
+            border-bottom: 1px solid var(--border-color);
+            transition: all 0.2s;
+        }
+
+        .settings-nav-item:last-child {
+            border-bottom: none;
+        }
+
+        .settings-nav-item:hover {
+            background: var(--bg-hover);
+            color: var(--text-primary);
+        }
+
+        .settings-nav-item.active {
+            background: rgba(59, 130, 246, 0.05);
+            color: var(--primary-color);
+            border-left: 3px solid var(--primary-color);
+        }
+        
+        .settings-nav-item.danger {
+            color: var(--danger-color);
+        }
+        
+        .settings-nav-item.danger:hover {
+            background: rgba(239, 68, 68, 0.1);
+        }
+
+        .settings-panel {
+            display: none;
+            animation: fadeIn 0.3s ease;
+        }
+
+        .settings-panel.active {
+            display: block;
+        }
+
+        .settings-card {
+            background: var(--bg-color);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            padding: 32px;
+            margin-bottom: 24px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.02);
+        }
+
+        .settings-card-header {
+            margin-bottom: 24px;
+            padding-bottom: 16px;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .settings-card-header h2 {
+            margin: 0 0 8px 0;
+            font-size: 1.5rem;
+            color: var(--text-primary);
+        }
+
+        .settings-card-header p {
+            margin: 0;
+            color: var(--text-secondary);
+        }
+
+        .grid-2 {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+        }
+
+        /* Theme Cards */
+        .theme-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 24px;
+        }
+
+        .theme-card {
+            border: 2px solid var(--border-color);
+            border-radius: 12px;
+            padding: 24px;
+            cursor: pointer;
+            text-align: center;
+            transition: all 0.2s;
+        }
+
+        .theme-card:hover {
+            border-color: var(--primary-light);
+            background: var(--bg-hover);
+        }
+
+        .theme-card.active {
+            border-color: var(--primary-color);
+            background: rgba(59, 130, 246, 0.05);
+        }
+
+        .theme-preview {
+            width: 100%;
+            height: 100px;
+            border-radius: 8px;
+            margin-bottom: 16px;
+            border: 1px solid var(--border-color);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 2rem;
+        }
+
+        .theme-light .theme-preview {
+            background: #ffffff;
+            color: #f59e0b;
+        }
+
+        .theme-dark .theme-preview {
+            background: #111827;
+            color: #60a5fa;
+        }
+
+        /* About Section */
+        .about-logo {
+            font-size: 4rem;
+            color: var(--primary-color);
+            text-align: center;
+            margin-bottom: 24px;
+        }
+        
+        .version-badge {
+            display: inline-block;
+            padding: 4px 12px;
+            background: var(--bg-hover);
+            border-radius: 16px;
+            font-size: 0.875rem;
+            font-weight: 600;
+            color: var(--text-secondary);
+            margin-bottom: 24px;
+        }
+    </style>
+</head>
+<body>
+    <div class="app-container">
+        <!-- Sidebar -->
+        <aside class="sidebar" id="sidebar"></aside>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <header class="top-nav">
+                <div class="nav-actions">
+                    <button class="btn-icon" id="menuToggle" style="display: none;"><i class="fas fa-bars"></i></button>
+                    <h2 style="font-size: 1.25rem;">Settings</h2>
+                </div>
+                <div class="nav-actions">
+                    <button class="btn btn-outline" onclick="window.location.href="../../dashboard.html"">
+                        <i class="fas fa-arrow-left"></i> Back to Dashboard
+                    </button>
+                </div>
+            </header>
+
+            <div class="page-content">
+                
+                <div class="settings-layout">
+                    
+                    <!-- Left Navigation -->
+                    <div class="settings-menu">
+                        <div class="settings-nav-item active" onclick="switchSettingsPanel('profile', this)">
+                            <i class="fas fa-user"></i> Profile Settings
+                        </div>
+                        <div class="settings-nav-item" onclick="switchSettingsPanel('security', this)">
+                            <i class="fas fa-lock"></i> Security
+                        </div>
+                        <div class="settings-nav-item" onclick="switchSettingsPanel('appearance', this)">
+                            <i class="fas fa-paint-brush"></i> Appearance
+                        </div>
+                        <div class="settings-nav-item" onclick="switchSettingsPanel('about', this)">
+                            <i class="fas fa-info-circle"></i> About Campus Connect
+                        </div>
+                        <div class="settings-nav-item danger" onclick="handleLogout()">
+                            <i class="fas fa-sign-out-alt"></i> Logout
+                        </div>
+                    </div>
+
+                    <!-- Right Content Panels -->
+                    <div class="settings-content">
+                        
+                        <!-- Panel: Profile Settings -->
+                        <div id="panel-profile" class="settings-panel active">
+                            <div class="settings-card">
+                                <div class="settings-card-header">
+                                    <h2>Profile Information</h2>
+                                    <p>Update your account's basic information.</p>
+                                </div>
+                                <form id="settingsProfileForm">
+                                    <div class="grid-2">
+                                        <div class="form-group">
+                                            <label class="form-label">Full Name</label>
+                                            <input type="text" id="profName" class="form-control" disabled>
+                                        </div>
+                                        <div class="form-group">
+                                            <label class="form-label">Email Address</label>
+                                            <input type="email" id="profEmail" class="form-control" disabled>
+                                        </div>
+                                    </div>
+                                    
+                                    <div id="studentOnlyFields" style="display: none;">
+                                        <div class="grid-2">
+                                            <div class="form-group">
+                                                <label class="form-label">Phone Number</label>
+                                                <input type="text" id="profPhone" class="form-control">
+                                            </div>
+                                            <div class="form-group">
+                                                <label class="form-label">Emergency Contact</label>
+                                                <input type="text" id="profParent" class="form-control">
+                                            </div>
+                                        </div>
+                                        <div class="form-group">
+                                            <label class="form-label">Residential Address</label>
+                                            <textarea id="profAddress" class="form-control" rows="3"></textarea>
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="form-actions" style="margin-top: 24px;">
+                                        <button type="submit" class="btn btn-primary" id="profSubmitBtn" style="display: none;">Save Changes</button>
+                                        <p id="adminNotice" style="color: var(--text-secondary); display: none;">
+                                            <i class="fas fa-info-circle"></i> Administrators cannot modify core profile details via this interface.
+                                        </p>
+                                    </div>
+                                </form>
+                            </div>
+                        </div>
+
+                        <!-- Panel: Security -->
+                        <div id="panel-security" class="settings-panel">
+                            <div class="settings-card">
+                                <div class="settings-card-header">
+                                    <h2>Change Password</h2>
+                                    <p>Ensure your account is using a long, random password to stay secure.</p>
+                                </div>
+                                <form id="settingsPasswordForm">
+                                    <div class="form-group" style="max-width: 400px;">
+                                        <label class="form-label">Current Password</label>
+                                        <input type="password" id="secCurrent" class="form-control" required>
+                                    </div>
+                                    <div class="grid-2" style="max-width: 820px;">
+                                        <div class="form-group">
+                                            <label class="form-label">New Password</label>
+                                            <input type="password" id="secNew" class="form-control" required>
+                                        </div>
+                                        <div class="form-group">
+                                            <label class="form-label">Confirm New Password</label>
+                                            <input type="password" id="secConfirm" class="form-control" required>
+                                        </div>
+                                    </div>
+                                    <div class="form-actions" style="margin-top: 12px;">
+                                        <button type="submit" class="btn btn-primary" id="secSubmitBtn">Update Password</button>
+                                    </div>
+                                </form>
+                            </div>
+                        </div>
+
+                        <!-- Panel: Appearance -->
+                        <div id="panel-appearance" class="settings-panel">
+                            <div class="settings-card">
+                                <div class="settings-card-header">
+                                    <h2>Appearance Settings</h2>
+                                    <p>Customize how Campus Connect looks on your device.</p>
+                                </div>
+                                
+                                <div class="theme-grid">
+                                    <div class="theme-card theme-light" id="themeCardLight" onclick="setAppTheme('light')">
+                                        <div class="theme-preview">
+                                            <i class="fas fa-sun"></i>
+                                        </div>
+                                        <h3 style="margin:0 0 4px 0;">Light Mode</h3>
+                                        <p style="margin:0; font-size: 0.875rem; color: var(--text-secondary);">Clean and bright</p>
+                                    </div>
+                                    
+                                    <div class="theme-card theme-dark" id="themeCardDark" onclick="setAppTheme('dark')">
+                                        <div class="theme-preview">
+                                            <i class="fas fa-moon"></i>
+                                        </div>
+                                        <h3 style="margin:0 0 4px 0;">Dark Mode</h3>
+                                        <p style="margin:0; font-size: 0.875rem; color: var(--text-secondary);">Easy on the eyes</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Panel: About -->
+                        <div id="panel-about" class="settings-panel">
+                            <div class="settings-card" style="text-align: center; padding: 48px 24px;">
+                                <div class="about-logo">
+                                    <i class="fas fa-graduation-cap"></i>
+                                </div>
+                                
+                                <h1 style="margin: 0 0 8px 0; font-size: 2rem;">Campus Connect</h1>
+                                <p style="color: var(--text-secondary); margin: 0 0 16px 0; font-size: 1.1rem;">Smart Student Management System</p>
+                                
+                                <div class="version-badge">Version 2.0.0</div>
+                                
+                                <p style="max-width: 600px; margin: 0 auto 32px auto; line-height: 1.6; color: var(--text-secondary);">
+                                    Campus Connect is a comprehensive, modern web application designed to streamline academic operations. 
+                                    It seamlessly connects administrators, faculty, and students to manage attendance, marks, fees, 
+                                    schedules, and digital resources securely and efficiently.
+                                </p>
+                                
+                                <div style="display: flex; gap: 16px; justify-content: center; margin-bottom: 48px;">
+                                    <a href="#" style="color: var(--primary-color); text-decoration: none; font-weight: 500;"><i class="fab fa-github"></i> View Source</a>
+                                    <a href="#" style="color: var(--primary-color); text-decoration: none; font-weight: 500;"><i class="fas fa-book"></i> Documentation</a>
+                                </div>
+                                
+                                <div style="border-top: 1px solid var(--border-color); padding-top: 32px; text-align: left; max-width: 600px; margin: 0 auto;">
+                                    <h3 style="margin-top: 0; color: var(--text-primary); display: flex; align-items: center; gap: 8px;">
+                                        <i class="fas fa-rocket" style="color: var(--warning-color);"></i> Product Roadmap (Coming Soon)
+                                    </h3>
+                                    <p style="color: var(--text-secondary); font-size: 0.875rem; margin-bottom: 16px;">
+                                        We are constantly working to improve Campus Connect. Here are the features planned for upcoming releases:
+                                    </p>
+                                    
+                                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px;">
+                                        <div style="background: var(--bg-hover); padding: 12px; border-radius: 8px; font-size: 0.875rem; color: var(--text-primary); display: flex; align-items: center; gap: 12px;">
+                                            <i class="fas fa-robot" style="color: var(--primary-color);"></i> AI Student Assistant
+                                        </div>
+                                        <div style="background: var(--bg-hover); padding: 12px; border-radius: 8px; font-size: 0.875rem; color: var(--text-primary); display: flex; align-items: center; gap: 12px;">
+                                            <i class="fas fa-mobile-alt" style="color: var(--primary-color);"></i> Progressive Web App
+                                        </div>
+                                        <div style="background: var(--bg-hover); padding: 12px; border-radius: 8px; font-size: 0.875rem; color: var(--text-primary); display: flex; align-items: center; gap: 12px;">
+                                            <i class="fas fa-shield-alt" style="color: var(--primary-color);"></i> OTP Authentication
+                                        </div>
+                                        <div style="background: var(--bg-hover); padding: 12px; border-radius: 8px; font-size: 0.875rem; color: var(--text-primary); display: flex; align-items: center; gap: 12px;">
+                                            <i class="fas fa-file-upload" style="color: var(--primary-color);"></i> Assignment Submission
+                                        </div>
+                                        <div style="background: var(--bg-hover); padding: 12px; border-radius: 8px; font-size: 0.875rem; color: var(--text-primary); display: flex; align-items: center; gap: 12px;">
+                                            <i class="fas fa-chart-line" style="color: var(--primary-color);"></i> Performance Analytics
+                                        </div>
+                                        <div style="background: var(--bg-hover); padding: 12px; border-radius: 8px; font-size: 0.875rem; color: var(--text-primary); display: flex; align-items: center; gap: 12px;">
+                                            <i class="fas fa-briefcase" style="color: var(--primary-color);"></i> Placement Portal
+                                        </div>
+                                        <div style="background: var(--bg-hover); padding: 12px; border-radius: 8px; font-size: 0.875rem; color: var(--text-primary); display: flex; align-items: center; gap: 12px;">
+                                            <i class="fas fa-file-signature" style="color: var(--primary-color);"></i> Resume Builder
+                                        </div>
+                                        <div style="background: var(--bg-hover); padding: 12px; border-radius: 8px; font-size: 0.875rem; color: var(--text-primary); display: flex; align-items: center; gap: 12px;">
+                                            <i class="fas fa-envelope-open-text" style="color: var(--primary-color);"></i> Email Notifications
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                    </div>
+
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <!-- Scripts -->
+    <script src="../../js/theme.js?v=2"></script>
+    <script src="../../js/api.js?v=2"></script>
+    <script src="../../js/settings.js?v=2"></script>
+    <script src="../../js/sidebar.js?v=2"></script>
+    <script src="../../js/router.js?v=2"></script>
+</body>
+</html>

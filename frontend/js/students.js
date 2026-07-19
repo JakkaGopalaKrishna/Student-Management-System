@@ -1,8 +1,8 @@
-document.addEventListener('DOMContentLoaded', async () => {
+(async () => {
     // Auth Check
     const token = localStorage.getItem('token');
     if (!token) {
-        window.location.href = 'index.html';
+        window.location.href = '/index.html';
         return;
     }
 
@@ -11,12 +11,12 @@ document.addEventListener('DOMContentLoaded', async () => {
         currentUser = await authAPI.getMe();
         if (currentUser.role !== 'admin') {
             // Only admins should access this page for now
-            window.location.href = 'dashboard.html';
+            window.location.href = '/dashboard.html';
             return;
         }
     } catch (error) {
         localStorage.removeItem('token');
-        window.location.href = 'index.html';
+        window.location.href = '/index.html';
     }
 
     // DOM Elements
@@ -28,10 +28,10 @@ document.addEventListener('DOMContentLoaded', async () => {
     const studentModal = document.getElementById('studentModal');
     const studentForm = document.getElementById('studentForm');
     const modalTitle = document.getElementById('modalTitle');
-    const passwordGroup = document.getElementById('passwordGroup');
     const modalMessage = document.getElementById('modalMessage');
     
     const viewModal = document.getElementById('viewModal');
+    const credentialsModal = document.getElementById('credentialsModal');
     
     // Photo Upload Elements
     const photoInput = document.getElementById('photoInput');
@@ -67,20 +67,19 @@ document.addEventListener('DOMContentLoaded', async () => {
             }
 
             students.forEach(student => {
-                const profile = student.student_profile || {};
                 const tr = document.createElement('tr');
                 tr.innerHTML = `
-                    <td><strong>${profile.roll_number || 'N/A'}</strong></td>
+                    <td><strong>${student.roll_number || 'N/A'}</strong></td>
                     <td>
                         <div style="display: flex; align-items: center; gap: 12px;">
                             <div style="width: 32px; height: 32px; border-radius: 50%; background: var(--primary-light); color: white; display: flex; align-items: center; justify-content: center; overflow: hidden;">
-                                ${profile.profile_photo ? `<img src="http://localhost:8000${profile.profile_photo}" style="width: 100%; height: 100%; object-fit: cover;">` : `<i class="fas fa-user" style="font-size: 14px;"></i>`}
+                                ${student.profile_photo ? `<img src="http://localhost:8000${student.profile_photo}" style="width: 100%; height: 100%; object-fit: cover;">` : `<i class="fas fa-user" style="font-size: 14px;"></i>`}
                             </div>
-                            <span>${student.full_name}</span>
+                            <span>${student.name}</span>
                         </div>
                     </td>
-                    <td>${profile.branch || 'N/A'}</td>
-                    <td>${profile.semester || 'N/A'}</td>
+                    <td>${student.department_branch || 'N/A'}</td>
+                    <td>${student.semester || 'N/A'}</td>
                     <td>${student.email}</td>
                     <td>
                         <div class="action-btns">
@@ -115,9 +114,10 @@ document.addEventListener('DOMContentLoaded', async () => {
         studentForm.reset();
         document.getElementById('studentId').value = '';
         modalTitle.textContent = 'Add New Student';
-        passwordGroup.style.display = 'block';
-        document.getElementById('stuPassword').required = true;
-        document.getElementById('stuEmail').disabled = false;
+        
+        document.getElementById('studentEmail').disabled = false;
+        document.getElementById('studentPassword').parentElement.style.display = 'block';
+        document.getElementById('studentPassword').required = true;
         document.getElementById('stuRoll').disabled = false;
         
         // Reset Photo
@@ -136,14 +136,19 @@ document.addEventListener('DOMContentLoaded', async () => {
         const id = document.getElementById('studentId').value;
         const submitBtn = studentForm.querySelector('button[type="submit"]');
         
-        const studentData = {
-            full_name: document.getElementById('stuName').value,
-            email: document.getElementById('stuEmail').value,
+        const payload = {
+            name: document.getElementById('stuName').value,
+            email: document.getElementById('studentEmail').value,
+            password: document.getElementById('studentPassword').value,
             roll_number: document.getElementById('stuRoll').value,
-            branch: document.getElementById('stuBranch').value,
+            department_branch: document.getElementById('stuBranch').value,
             semester: document.getElementById('stuSemester').value,
+            gender: document.getElementById('stuGender').value,
+            dob: document.getElementById('stuDob').value,
+            section: document.getElementById('stuSection').value,
             phone: document.getElementById('stuPhone').value,
-            parent_details: document.getElementById('stuParent').value,
+            parent_name: document.getElementById('stuParentName').value,
+            parent_phone: document.getElementById('stuParentPhone').value,
             address: document.getElementById('stuAddress').value
         };
 
@@ -155,32 +160,44 @@ document.addEventListener('DOMContentLoaded', async () => {
             
             if (id) {
                 // Edit
-                // Exclude fields not in StudentProfileUpdate
                 const updateData = {
-                    branch: studentData.branch,
-                    semester: studentData.semester,
-                    phone: studentData.phone,
-                    parent_details: studentData.parent_details,
-                    address: studentData.address
+                    department_branch: payload.department_branch,
+                    semester: payload.semester,
+                    gender: payload.gender,
+                    dob: payload.dob,
+                    section: payload.section,
+                    phone: payload.phone,
+                    parent_name: payload.parent_name,
+                    parent_phone: payload.parent_phone,
+                    address: payload.address
                 };
                 savedStudent = await studentsAPI.update(id, updateData);
                 showModalMessage('Student updated successfully!', 'success');
+                
+                // Handle Photo Upload
+                if (selectedPhotoFile && savedStudent) {
+                    await studentsAPI.uploadPhoto(savedStudent.id, selectedPhotoFile);
+                }
+
+                loadStudents();
+                setTimeout(() => {
+                    closeStudentModal();
+                }, 1000);
             } else {
                 // Create
-                studentData.password = document.getElementById('stuPassword').value;
-                savedStudent = await studentsAPI.create(studentData);
-                showModalMessage('Student created successfully!', 'success');
-            }
+                const student = await studentsAPI.create(payload);
+                
+                // Handle Photo Upload
+                if (selectedPhotoFile && student) {
+                    await studentsAPI.uploadPhoto(student.id, selectedPhotoFile);
+                }
 
-            // Handle Photo Upload
-            if (selectedPhotoFile && savedStudent) {
-                await studentsAPI.uploadPhoto(savedStudent.id, selectedPhotoFile);
+                showModalMessage('Student created successfully.', 'success');
+                await loadStudents();
+                setTimeout(() => {
+                    closeStudentModal();
+                }, 1500);
             }
-
-            loadStudents();
-            setTimeout(() => {
-                closeStudentModal();
-            }, 1000);
             
         } catch (error) {
             showModalMessage(error.message, 'error');
@@ -205,12 +222,16 @@ document.addEventListener('DOMContentLoaded', async () => {
     // Logout
     document.getElementById('logoutBtn').addEventListener('click', () => {
         localStorage.removeItem('token');
-        window.location.href = 'index.html';
+        window.location.href = '/index.html';
     });
 
     // Global Modal Functions
     window.closeStudentModal = () => {
         studentModal.style.display = 'none';
+    };
+
+    window.closeCredentialsModal = () => {
+        credentialsModal.style.display = 'none';
     };
 
     window.closeViewModal = () => {
@@ -231,31 +252,34 @@ document.addEventListener('DOMContentLoaded', async () => {
     window.editStudent = async (id) => {
         try {
             const student = await studentsAPI.getById(id);
-            const profile = student.student_profile || {};
             
             document.getElementById('studentId').value = student.id;
             modalTitle.textContent = 'Edit Student';
-            passwordGroup.style.display = 'none';
-            document.getElementById('stuPassword').required = false;
             
-            document.getElementById('stuName').value = student.full_name;
+            document.getElementById('stuName').value = student.name;
             document.getElementById('stuName').disabled = true; // Not in update schema
-            document.getElementById('stuEmail').value = student.email;
-            document.getElementById('stuEmail').disabled = true;
-            document.getElementById('stuRoll').value = profile.roll_number || '';
+            document.getElementById('studentEmail').value = student.email;
+            document.getElementById('studentEmail').disabled = true;
+            document.getElementById('studentPassword').parentElement.style.display = 'none';
+            document.getElementById('studentPassword').required = false;
+            document.getElementById('stuRoll').value = student.roll_number || '';
             document.getElementById('stuRoll').disabled = true;
             
-            document.getElementById('stuBranch').value = profile.branch || '';
-            document.getElementById('stuSemester').value = profile.semester || '';
-            document.getElementById('stuPhone').value = profile.phone || '';
-            document.getElementById('stuParent').value = profile.parent_details || '';
-            document.getElementById('stuAddress').value = profile.address || '';
+            document.getElementById('stuBranch').value = student.department_branch || '';
+            document.getElementById('stuSemester').value = student.semester || '';
+            document.getElementById('stuGender').value = student.gender || '';
+            document.getElementById('stuDob').value = student.dob || '';
+            document.getElementById('stuSection').value = student.section || '';
+            document.getElementById('stuPhone').value = student.phone || '';
+            document.getElementById('stuParentName').value = student.parent_name || '';
+            document.getElementById('stuParentPhone').value = student.parent_phone || '';
+            document.getElementById('stuAddress').value = student.address || '';
             
             // Photo handling
             selectedPhotoFile = null;
             photoInput.value = '';
-            if (profile.profile_photo) {
-                photoPreview.innerHTML = `<img src="http://localhost:8000${profile.profile_photo}" style="width: 100%; height: 100%; object-fit: cover;">`;
+            if (student.profile_photo) {
+                photoPreview.innerHTML = `<img src="http://localhost:8000${student.profile_photo}" style="width: 100%; height: 100%; object-fit: cover;">`;
             } else {
                 photoPreview.innerHTML = '<i class="fas fa-user"></i>';
             }
@@ -270,21 +294,20 @@ document.addEventListener('DOMContentLoaded', async () => {
     window.viewStudent = async (id) => {
         try {
             const student = await studentsAPI.getById(id);
-            const profile = student.student_profile || {};
             
-            document.getElementById('viewName').textContent = student.full_name;
+            document.getElementById('viewName').textContent = student.name;
             document.getElementById('viewEmail').textContent = student.email;
-            document.getElementById('viewRoll').textContent = profile.roll_number || 'N/A';
-            document.getElementById('viewBranch').textContent = profile.branch || 'N/A';
-            document.getElementById('viewSem').textContent = profile.semester || 'N/A';
+            document.getElementById('viewRoll').textContent = student.roll_number || 'N/A';
+            document.getElementById('viewBranch').textContent = student.department_branch || 'N/A';
+            document.getElementById('viewSem').textContent = student.semester || 'N/A';
             
-            document.getElementById('viewPhone').textContent = profile.phone || 'No phone provided';
-            document.getElementById('viewAddress').textContent = profile.address || 'No address provided';
-            document.getElementById('viewParent').textContent = profile.parent_details || 'No details provided';
+            document.getElementById('viewPhone').textContent = student.phone || 'No phone provided';
+            document.getElementById('viewAddress').textContent = student.address || 'No address provided';
+            document.getElementById('viewParent').textContent = (student.parent_name ? `${student.parent_name} (${student.parent_phone || ''})` : 'No details provided');
             
             const viewPhoto = document.getElementById('viewPhoto');
-            if (profile.profile_photo) {
-                viewPhoto.innerHTML = `<img src="http://localhost:8000${profile.profile_photo}" style="width: 100%; height: 100%; object-fit: cover;">`;
+            if (student.profile_photo) {
+                viewPhoto.innerHTML = `<img src="http://localhost:8000${student.profile_photo}" style="width: 100%; height: 100%; object-fit: cover;">`;
             } else {
                 viewPhoto.innerHTML = '<i class="fas fa-user"></i>';
             }
@@ -294,4 +317,4 @@ document.addEventListener('DOMContentLoaded', async () => {
             alert('Failed to load student details');
         }
     };
-});
+})();

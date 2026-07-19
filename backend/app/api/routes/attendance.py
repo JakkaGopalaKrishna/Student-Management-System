@@ -4,13 +4,13 @@ from sqlalchemy.orm import Session
 from sqlalchemy import extract, func
 from datetime import date
 from app.api import deps
-from app.models.user import User, UserRole
+
 from app.models.attendance import Attendance, AttendanceStatus
 from app.schemas.attendance import (
     AttendanceCreate, AttendanceUpdate, AttendanceResponse, 
     BulkAttendanceCreate, StudentAttendanceStats, SubjectStats, MonthlyStats
 )
-from app.schemas.student import StudentResponse
+from app.schemas.user import StudentResponse
 import collections
 
 router = APIRouter()
@@ -18,7 +18,7 @@ router = APIRouter()
 @router.get("/", response_model=List[AttendanceResponse])
 def get_attendance(
     db: Session = Depends(deps.get_db),
-    current_user: User = Depends(deps.get_current_active_user),
+    current_user: Any = Depends(deps.get_current_active_user),
     student_id: Optional[int] = None,
     subject: Optional[str] = None,
     target_date: Optional[date] = None,
@@ -28,7 +28,7 @@ def get_attendance(
     """
     query = db.query(Attendance)
     
-    if current_user.role == UserRole.STUDENT:
+    if current_user.role == "student":
         query = query.filter(Attendance.student_id == current_user.id)
     else:
         if student_id:
@@ -46,12 +46,12 @@ def create_bulk_attendance(
     *,
     db: Session = Depends(deps.get_db),
     attendance_in: BulkAttendanceCreate,
-    current_user: User = Depends(deps.get_current_active_user),
+    current_user: Any = Depends(deps.get_current_active_user),
 ) -> Any:
     """
     Create multiple attendance records at once (Admin only).
     """
-    if current_user.role != UserRole.ADMIN:
+    if current_user.role != "admin":
         raise HTTPException(status_code=403, detail="Not enough permissions")
 
     created_records = []
@@ -98,12 +98,12 @@ def update_attendance(
     attendance_id: int,
     db: Session = Depends(deps.get_db),
     attendance_in: AttendanceUpdate,
-    current_user: User = Depends(deps.get_current_active_user),
+    current_user: Any = Depends(deps.get_current_active_user),
 ) -> Any:
     """
     Update an attendance record (Admin only).
     """
-    if current_user.role != UserRole.ADMIN:
+    if current_user.role != "admin":
         raise HTTPException(status_code=403, detail="Not enough permissions")
 
     record = db.query(Attendance).filter(Attendance.id == attendance_id).first()
@@ -125,12 +125,12 @@ def delete_attendance(
     *,
     attendance_id: int,
     db: Session = Depends(deps.get_db),
-    current_user: User = Depends(deps.get_current_active_user),
+    current_user: Any = Depends(deps.get_current_active_user),
 ) -> Any:
     """
     Delete an attendance record (Admin only).
     """
-    if current_user.role != UserRole.ADMIN:
+    if current_user.role != "admin":
         raise HTTPException(status_code=403, detail="Not enough permissions")
 
     record = db.query(Attendance).filter(Attendance.id == attendance_id).first()
@@ -144,12 +144,12 @@ def delete_attendance(
 @router.get("/me/stats", response_model=StudentAttendanceStats)
 def get_attendance_stats(
     db: Session = Depends(deps.get_db),
-    current_user: User = Depends(deps.get_current_active_user),
+    current_user: Any = Depends(deps.get_current_active_user),
 ) -> Any:
     """
     Get detailed attendance statistics for the logged-in student.
     """
-    if current_user.role != UserRole.STUDENT:
+    if current_user.role != "student":
         raise HTTPException(status_code=403, detail="Only students can view their own stats")
 
     records = db.query(Attendance).filter(Attendance.student_id == current_user.id).all()

@@ -3,7 +3,7 @@
  * Intercepts sidebar clicks to fetch HTML without full page reload.
  */
 
-document.addEventListener('DOMContentLoaded', () => {
+(() => {
     // Listen for all clicks
     document.body.addEventListener('click', e => {
         // Find if the clicked element or its parent has a data-link attribute
@@ -16,7 +16,11 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // Handle browser back/forward buttons
     window.addEventListener('popstate', () => {
-        navigateTo(location.pathname.split('/').pop() || 'dashboard.html', false);
+        let path = location.pathname;
+        if (path === '/' || path === '/admin' || path === '/admin/') {
+            path = '/dashboard.html';
+        }
+        navigateTo(path, false);
     });
 });
 
@@ -39,16 +43,53 @@ async function navigateTo(url, pushState = true) {
         const parser = new DOMParser();
         const doc = parser.parseFromString(text, 'text/html');
         
-        // Extract the main content. We look for .main-content or .page-content
-        const newMain = doc.querySelector('.main-content') || doc.querySelector('.page-content');
-        const currentMain = document.querySelector('.main-content') || document.querySelector('.page-content');
+        // Extract the main content. We look for .page-content first so we don't destroy the header
+        const newMain = doc.querySelector('.page-content') || doc.querySelector('.main-content');
+        const currentMain = document.querySelector('.page-content') || document.querySelector('.main-content');
         
         if (newMain && currentMain) {
             // Replace the HTML
             currentMain.innerHTML = newMain.innerHTML;
             
-            // Re-execute any scripts inside the new content
-            executeScripts(currentMain);
+            // Swap all modals
+            document.querySelectorAll('.modal').forEach(m => m.remove());
+            doc.querySelectorAll('.modal').forEach(m => {
+                document.body.appendChild(m.cloneNode(true));
+            });
+            
+            // Clean up old SPA injected styles
+            document.head.querySelectorAll('style[data-spa-style="true"]').forEach(s => s.remove());
+            
+            // Inject new styles from the fetched document
+            doc.head.querySelectorAll('style').forEach(s => {
+                const newStyle = document.createElement('style');
+                newStyle.textContent = s.textContent;
+                newStyle.setAttribute('data-spa-style', 'true');
+                document.head.appendChild(newStyle);
+            });
+            
+            // Update the top-nav title if it exists
+            const newTitle = doc.querySelector('.top-nav h2');
+            const currentTitle = document.querySelector('.top-nav h2');
+            if (newTitle && currentTitle) {
+                currentTitle.textContent = newTitle.textContent;
+            }
+            
+            // Re-execute scripts from the fetched document body
+            // We avoid re-executing router.js, sidebar.js, theme.js, api.js to prevent duplicates/errors
+            const newScripts = doc.querySelectorAll('script');
+            newScripts.forEach(oldScript => {
+                const src = oldScript.getAttribute('src');
+                if (src && !src.includes('router.js') && !src.includes('sidebar.js') && !src.includes('theme.js') && !src.includes('api.js') && !src.includes('app.js')) {
+                    const newScript = document.createElement('script');
+                    newScript.src = src;
+                    document.body.appendChild(newScript);
+                } else if (!src) {
+                    const newScript = document.createElement('script');
+                    newScript.textContent = oldScript.textContent;
+                    document.body.appendChild(newScript);
+                }
+            });
             
             // Update the URL bar
             if (pushState) {
@@ -72,11 +113,16 @@ async function navigateTo(url, pushState = true) {
 }
 
 function updateSidebarActiveState(url) {
+    // Normalize url for comparison
+    const normalizedUrl = url.replace(/\/index\.html$/, '').replace(/\/$/, '');
     const page = url.split('/').pop();
+    
     document.querySelectorAll('.nav-item').forEach(item => {
         item.classList.remove('active');
         const link = item.getAttribute('href');
-        if (link === page) {
+        
+        // Match exact or fallback to page
+        if (link === normalizedUrl || link === page) {
             item.classList.add('active');
         }
     });
@@ -95,5 +141,5 @@ function executeScripts(container) {
             newScript.appendChild(document.createTextNode(oldScript.innerHTML));
         }
         oldScript.parentNode.replaceChild(newScript, oldScript);
-    });
+    })();
 }

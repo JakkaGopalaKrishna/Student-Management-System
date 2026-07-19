@@ -1,0 +1,201 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Notification Management - Campus Connect</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <link rel="stylesheet" href="../../css/variables.css">
+    <link rel="stylesheet" href="../../css/layout.css">
+    <link rel="stylesheet" href="../../css/components.css">
+    <style>
+        .page-layout {
+            display: flex;
+            flex-direction: column;
+            gap: 24px;
+        }
+
+        .notification-card {
+            background: var(--bg-color);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            padding: 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            gap: 20px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.02);
+        }
+
+        .notification-content {
+            flex-grow: 1;
+        }
+
+        .notification-header {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 8px;
+        }
+
+        .notification-title {
+            font-size: 1.125rem;
+            font-weight: 600;
+            color: var(--text-primary);
+            margin: 0;
+        }
+
+        .notification-time {
+            font-size: 0.875rem;
+            color: var(--text-secondary);
+        }
+
+        .notification-message {
+            color: var(--text-secondary);
+            margin: 0;
+            line-height: 1.5;
+        }
+
+        .priority-badge {
+            padding: 4px 10px;
+            border-radius: 12px;
+            font-size: 0.75rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .priority-high { background: rgba(239, 68, 68, 0.1); color: var(--danger-color); }
+        .priority-medium { background: rgba(245, 158, 11, 0.1); color: var(--warning-color); }
+        .priority-low { background: rgba(16, 185, 129, 0.1); color: var(--success-color); }
+
+        .action-btns {
+            display: flex;
+            gap: 8px;
+        }
+        .action-btns button {
+            width: 32px;
+            height: 32px;
+            border-radius: 6px;
+            border: none;
+            cursor: pointer;
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .btn-edit { background: var(--warning-color); }
+        .btn-delete { background: var(--danger-color); }
+
+        .modal {
+            display: none;
+            position: fixed;
+            inset: 0;
+            background: rgba(0,0,0,0.5);
+            z-index: 1000;
+            align-items: center;
+            justify-content: center;
+            backdrop-filter: blur(4px);
+        }
+        .modal-content {
+            width: 100%;
+            max-width: 500px;
+            background: var(--bg-color);
+            border-radius: 12px;
+            padding: 24px;
+            position: relative;
+        }
+        .modal-close {
+            position: absolute;
+            top: 24px;
+            right: 24px;
+            background: none;
+            border: none;
+            font-size: 1.25rem;
+            color: var(--text-secondary);
+            cursor: pointer;
+        }
+    </style>
+</head>
+<body>
+    <div class="app-container">
+        <!-- Sidebar -->
+        <aside class="sidebar" id="sidebar"></aside>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <header class="top-nav">
+                <div class="nav-actions">
+                    <button class="btn-icon" id="menuToggle" style="display: none;"><i class="fas fa-bars"></i></button>
+                    <h2 style="font-size: 1.25rem;">Broadcast Announcements</h2>
+                </div>
+                <div class="nav-actions">
+                    <button id="themeToggleBtn" class="btn-icon"><i class="fas fa-moon"></i></button>
+                    <button id="logoutBtn" class="btn-icon" title="Logout"><i class="fas fa-sign-out-alt"></i></button>
+                </div>
+            </header>
+
+            <div class="page-content">
+                <div class="page-layout">
+                    
+                    <div style="display: flex; justify-content: space-between; align-items: center;">
+                        <h3 style="margin: 0;">Sent Announcements</h3>
+                        <button class="btn btn-primary" onclick="openNotifModal()">
+                            <i class="fas fa-bullhorn"></i> New Announcement
+                        </button>
+                    </div>
+
+                    <div id="notificationsList" style="display: flex; flex-direction: column; gap: 16px;">
+                        <!-- Populated by JS -->
+                    </div>
+
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <!-- Notification Modal -->
+    <div id="notifModal" class="modal">
+        <div class="modal-content">
+            <button class="modal-close" onclick="closeNotifModal()"><i class="fas fa-times"></i></button>
+            <h3 id="notifModalTitle" style="margin-bottom: 24px;">Broadcast Announcement</h3>
+            
+            <form id="notifForm">
+                <input type="hidden" id="notifId">
+                
+                <div class="form-group">
+                    <label class="form-label">Subject Title</label>
+                    <input type="text" id="notifTitle" class="form-control" placeholder="e.g. Campus Closed Due to Weather" required>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">Priority Level</label>
+                    <select id="notifPriority" class="form-control" required>
+                        <option value="low">Low - General Info</option>
+                        <option value="medium">Medium - Important</option>
+                        <option value="high">High - Urgent Alert</option>
+                    </select>
+                </div>
+                
+                <div class="form-group">
+                    <label class="form-label">Message Details</label>
+                    <textarea id="notifMessage" class="form-control" rows="5" placeholder="Enter your full announcement here..." required></textarea>
+                </div>
+
+                <button type="submit" class="btn btn-primary" style="width: 100%; margin-top: 16px;" id="submitBtn">Send Announcement</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Scripts -->
+    <script src="../../js/theme.js?v=2"></script>
+    <script src="../../js/api.js?v=2"></script>
+    <script src="../../js/notifications.js?v=2"></script>
+    <script src="../../js/sidebar.js?v=2"></script>
+    <script src="../../js/router.js?v=2"></script>
+</body>
+</html>

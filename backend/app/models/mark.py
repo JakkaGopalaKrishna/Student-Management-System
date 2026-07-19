@@ -11,7 +11,7 @@ class Mark(Base):
     __tablename__ = "marks"
 
     id = Column(Integer, primary_key=True, index=True)
-    student_id = Column(Integer, ForeignKey("users.id"), nullable=False, index=True)
+    student_id = Column(Integer, ForeignKey("students.id"), nullable=False, index=True)
     subject = Column(String(100), nullable=False, index=True)
     semester = Column(String(20), nullable=False, index=True)
     exam_type = Column(Enum(ExamType), nullable=False)
@@ -20,4 +20,4 @@ class Mark(Base):
     remarks = Column(Text, nullable=True)
 
     # Relationships
-    student = relationship("User", back_populates="marks")
+    student = relationship("Student", back_populates="marks")

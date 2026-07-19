@@ -2,7 +2,7 @@ from typing import Any, List, Optional
 from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
 from app.api import deps
-from app.models.user import User, UserRole
+
 from app.models.holiday import Holiday
 from app.schemas.holiday import HolidayCreate, HolidayResponse, HolidayUpdate
 from datetime import date
@@ -12,7 +12,7 @@ router = APIRouter()
 @router.get("/", response_model=List[HolidayResponse])
 def get_holidays(
     db: Session = Depends(deps.get_db),
-    current_user: User = Depends(deps.get_current_active_user),
+    current_user: Any = Depends(deps.get_current_active_user),
     year: Optional[int] = None,
     month: Optional[int] = None
 ) -> Any:
@@ -40,12 +40,12 @@ def create_holiday(
     *,
     db: Session = Depends(deps.get_db),
     holiday_in: HolidayCreate,
-    current_user: User = Depends(deps.get_current_active_user),
+    current_user: Any = Depends(deps.get_current_active_user),
 ) -> Any:
     """
     Create a new holiday (Admin only).
     """
-    if current_user.role != UserRole.ADMIN:
+    if current_user.role != "admin":
         raise HTTPException(status_code=403, detail="Not enough permissions")
         
     # Check if holiday exists on this date
@@ -69,12 +69,12 @@ def update_holiday(
     holiday_id: int,
     db: Session = Depends(deps.get_db),
     holiday_in: HolidayUpdate,
-    current_user: User = Depends(deps.get_current_active_user),
+    current_user: Any = Depends(deps.get_current_active_user),
 ) -> Any:
     """
     Update holiday (Admin only).
     """
-    if current_user.role != UserRole.ADMIN:
+    if current_user.role != "admin":
         raise HTTPException(status_code=403, detail="Not enough permissions")
 
     record = db.query(Holiday).filter(Holiday.id == holiday_id).first()
@@ -103,12 +103,12 @@ def delete_holiday(
     *,
     holiday_id: int,
     db: Session = Depends(deps.get_db),
-    current_user: User = Depends(deps.get_current_active_user),
+    current_user: Any = Depends(deps.get_current_active_user),
 ) -> Any:
     """
     Delete a holiday (Admin only).
     """
-    if current_user.role != UserRole.ADMIN:
+    if current_user.role != "admin":
         raise HTTPException(status_code=403, detail="Not enough permissions")
 
     record = db.query(Holiday).filter(Holiday.id == holiday_id).first()

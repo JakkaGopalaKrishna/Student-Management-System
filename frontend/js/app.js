@@ -1,10 +1,10 @@
-document.addEventListener('DOMContentLoaded', async () => {
+(async () => {
     // Only run this script on dashboard pages
-    if (!window.location.pathname.includes('dashboard.html')) return;
+    if (!window.location.pathname.includes('dashboard')) return;
 
     const token = localStorage.getItem('token');
     if (!token) {
-        window.location.href = 'index.html';
+        window.location.href = '/index.html';
         return;
     }
 
@@ -12,25 +12,60 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     try {
         currentUser = await authAPI.getMe();
-        document.getElementById('userName').textContent = currentUser.full_name;
+        document.getElementById('userName').textContent = currentUser.name;
         document.getElementById('userRole').textContent = currentUser.role.charAt(0).toUpperCase() + currentUser.role.slice(1);
         
         // Role based UI logic
         if (currentUser.role === 'admin') {
-            document.getElementById('navSettings').style.display = 'flex';
-            document.getElementById('adminDashboard').style.display = 'block';
+            const navSettings = document.getElementById('navSettings');
+            if (navSettings) navSettings.style.display = 'flex';
             
-            // Show all admin sidebar items
-            document.querySelectorAll('.admin-only').forEach(el => {
-                el.style.display = 'flex';
-            });
+            const adminDash = document.getElementById('adminDashboard');
+            if (adminDash) {
+                adminDash.style.display = 'block';
+                
+                // Fetch stats and render
+                try {
+                    const stats = await dashboardAPI.getStats();
+                    
+                    const formatCurrency = (amount) => new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD', maximumFractionDigits: 0 }).format(amount);
+                    
+                    const setText = (id, text) => {
+                        const el = document.getElementById(id);
+                        if (el) el.textContent = text;
+                    };
+                    
+                    setText('stat-total-students', stats.total_students.toLocaleString());
+                    setText('stat-total-branches', stats.total_branches.toLocaleString());
+                    setText('stat-total-subjects', stats.total_subjects.toLocaleString());
+                    setText('stat-total-notes', stats.total_notes.toLocaleString());
+                    setText('stat-total-papers', stats.total_papers.toLocaleString());
+                    setText('stat-notifications', stats.notifications.toLocaleString());
+                    setText('stat-holidays', stats.holidays.toLocaleString());
+                    
+                    setText('stat-fee-collected', formatCurrency(stats.fee_collected));
+                    setText('stat-fee-pending', formatCurrency(stats.fee_pending));
+                    
+                    setText('stat-attendance-percent', stats.overall_attendance_percent + '%');
+                } catch (error) {
+                    console.error('Failed to load dashboard stats', error);
+                }
+            } else if (window.location.pathname.endsWith('/dashboard.html')) {
+                // Fallback: If Admin ended up on the root dashboard, redirect to admin portal
+                window.location.href = '/admin/dashboard/index.html';
+                return;
+            }
+        } else if (currentUser.role === 'teacher') {
+            // Teacher dashboard (could share with student dashboard for now or have its own)
+            document.getElementById('studentDashboard').style.display = 'block';
+            document.getElementById('displayStudentName').textContent = currentUser.name;
         } else {
             document.getElementById('studentDashboard').style.display = 'block';
-            document.getElementById('displayStudentName').textContent = currentUser.full_name;
+            document.getElementById('displayStudentName').textContent = currentUser.name;
 
             // Show student-only elements (like notification bell)
             document.querySelectorAll('.student-only').forEach(el => {
-                el.style.display = 'flex'; // or block depending on original, let's use default empty or flex
+                el.style.display = 'flex'; 
             });
 
             // Fetch notifications
@@ -49,13 +84,13 @@ document.addEventListener('DOMContentLoaded', async () => {
     } catch (error) {
         console.error('Failed to load user session');
         localStorage.removeItem('token');
-        window.location.href = 'index.html';
+        window.location.href = '/index.html';
     }
 
     // Logout handler
     document.getElementById('logoutBtn').addEventListener('click', () => {
         localStorage.removeItem('token');
-        window.location.href = 'index.html';
+        window.location.href = '/index.html';
     });
 
     // Sidebar Toggle for Mobile
@@ -223,4 +258,4 @@ document.addEventListener('DOMContentLoaded', async () => {
             }, 300);
         });
     }
-});
+})();

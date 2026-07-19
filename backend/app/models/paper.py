@@ -14,6 +14,6 @@ class Paper(Base):
     year = Column(Integer, nullable=False, index=True)
     file_path = Column(String(500), nullable=False)
     upload_date = Column(DateTime, default=datetime.utcnow, nullable=False)
-    uploader_id = Column(Integer, ForeignKey("users.id"), nullable=False)
+    uploader_id = Column(Integer, ForeignKey("admins.id"), nullable=False)
 
-    uploader = relationship("User")
+    uploader = relationship("Admin")

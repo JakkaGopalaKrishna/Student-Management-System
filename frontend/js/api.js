@@ -34,10 +34,11 @@ const fetchAPI = async (endpoint, options = {}) => {
 };
 
 const authAPI = {
-    login: async (email, password) => {
+    login: async (email, password, role) => {
         const formData = new URLSearchParams();
         formData.append('username', email); // OAuth2 expects 'username'
         formData.append('password', password);
+        formData.append('role', role);
 
         const response = await fetch(`${BASE_URL}/auth/login`, {
             method: 'POST',
@@ -53,19 +54,21 @@ const authAPI = {
         }
         return data;
     },
-    register: (name, email, password) => fetchAPI('/auth/register', {
+    forgotPassword: (email, role) => fetchAPI('/auth/forgot-password', {
         method: 'POST',
-        body: JSON.stringify({ full_name: name, email, password })
-    }),
-    forgotPassword: (email) => fetchAPI('/auth/forgot-password', {
-        method: 'POST',
-        body: JSON.stringify({ email })
+        body: JSON.stringify({ email, role })
     }),
     changePassword: (currentPassword, newPassword) => fetchAPI('/auth/change-password', {
         method: 'POST',
         body: JSON.stringify({ current_password: currentPassword, new_password: newPassword })
     }),
     getMe: () => fetchAPI('/auth/me'),
+};
+
+const dashboardAPI = {
+    getStats: async () => {
+        return fetchAPI('/dashboard/stats');
+    }
 };
 
 const studentsAPI = {
@@ -127,6 +130,39 @@ const studentsAPI = {
             throw new Error(data.detail || 'Photo upload failed');
         }
         return data;
+    }
+};
+
+const teachersAPI = {
+    getAll: async (search = '', department = '') => {
+        const params = new URLSearchParams();
+        if (search) params.append('search', search);
+        if (department) params.append('department', department);
+        return fetchAPI(`/teachers/?${params.toString()}`);
+    },
+    
+    getById: async (id) => {
+        return fetchAPI(`/teachers/${id}`);
+    },
+    
+    create: async (data) => {
+        return fetchAPI('/teachers/', {
+            method: 'POST',
+            body: JSON.stringify(data)
+        });
+    },
+    
+    update: async (id, data) => {
+        return fetchAPI(`/teachers/${id}`, {
+            method: 'PUT',
+            body: JSON.stringify(data)
+        });
+    },
+    
+    delete: async (id) => {
+        return fetchAPI(`/teachers/${id}`, {
+            method: 'DELETE'
+        });
     }
 };
 

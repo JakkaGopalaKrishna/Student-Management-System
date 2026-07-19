@@ -1,0 +1,238 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Holiday Management - Campus Connect</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <!-- FullCalendar CSS -->
+    <script src='https://cdn.jsdelivr.net/npm/fullcalendar@6.1.15/index.global.min.js'></script>
+
+    <link rel="stylesheet" href="../../css/variables.css">
+    <link rel="stylesheet" href="../../css/layout.css">
+    <link rel="stylesheet" href="../../css/components.css">
+    <style>
+        .page-layout {
+            display: grid;
+            grid-template-columns: 1fr 350px;
+            gap: 24px;
+        }
+
+        /* Responsive Layout */
+        @media (max-width: 1024px) {
+            .page-layout {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        /* Calendar Card Styling */
+        #calendar {
+            background: var(--bg-color);
+            padding: 20px;
+            border-radius: 12px;
+            border: 1px solid var(--border-color);
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+            min-height: 600px;
+        }
+
+        .fc .fc-toolbar-title {
+            font-size: 1.5rem;
+            color: var(--text-primary);
+        }
+
+        .fc .fc-button-primary {
+            background-color: var(--primary-color);
+            border-color: var(--primary-color);
+        }
+
+        .fc .fc-button-primary:not(:disabled):active,
+        .fc .fc-button-primary:not(:disabled).fc-button-active {
+            background-color: var(--primary-dark);
+            border-color: var(--primary-dark);
+        }
+
+        .fc-theme-standard td, .fc-theme-standard th {
+            border-color: var(--border-color);
+        }
+
+        .fc-day-today {
+            background: rgba(59, 130, 246, 0.05) !important;
+        }
+
+        /* Upcoming Holidays List */
+        .upcoming-list {
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+        }
+
+        .holiday-item {
+            background: var(--bg-color);
+            border: 1px solid var(--border-color);
+            padding: 16px;
+            border-radius: 8px;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .holiday-item-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .holiday-date {
+            font-size: 0.875rem;
+            font-weight: 600;
+            color: var(--primary-color);
+            background: rgba(59, 130, 246, 0.1);
+            padding: 4px 10px;
+            border-radius: 12px;
+        }
+
+        .holiday-title {
+            font-size: 1.1rem;
+            font-weight: 600;
+            color: var(--text-primary);
+            margin: 0;
+        }
+
+        .holiday-desc {
+            font-size: 0.875rem;
+            color: var(--text-secondary);
+            margin: 0;
+        }
+
+        .action-btns {
+            display: flex;
+            gap: 8px;
+            margin-top: 8px;
+        }
+        .action-btns button {
+            padding: 6px 12px;
+            border-radius: 6px;
+            border: none;
+            cursor: pointer;
+            font-size: 0.875rem;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+        .btn-edit { background: var(--warning-color); color: white; }
+        .btn-delete { background: var(--danger-color); color: white; }
+
+        .modal {
+            display: none;
+            position: fixed;
+            inset: 0;
+            background: rgba(0,0,0,0.5);
+            z-index: 1000;
+            align-items: center;
+            justify-content: center;
+            backdrop-filter: blur(4px);
+        }
+        .modal-content {
+            width: 100%;
+            max-width: 400px;
+            background: var(--bg-color);
+            border-radius: 12px;
+            padding: 24px;
+            position: relative;
+        }
+        .modal-close {
+            position: absolute;
+            top: 24px;
+            right: 24px;
+            background: none;
+            border: none;
+            font-size: 1.25rem;
+            color: var(--text-secondary);
+            cursor: pointer;
+        }
+    </style>
+</head>
+<body>
+    <div class="app-container">
+        <!-- Sidebar -->
+        <aside class="sidebar" id="sidebar"></aside>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <header class="top-nav">
+                <div class="nav-actions">
+                    <button class="btn-icon" id="menuToggle" style="display: none;"><i class="fas fa-bars"></i></button>
+                    <h2 style="font-size: 1.25rem;">Holiday Calendar</h2>
+                </div>
+                <div class="nav-actions">
+                    <button id="themeToggleBtn" class="btn-icon"><i class="fas fa-moon"></i></button>
+                    <button id="logoutBtn" class="btn-icon" title="Logout"><i class="fas fa-sign-out-alt"></i></button>
+                </div>
+            </header>
+
+            <div class="page-content">
+                <div class="page-layout">
+                    <!-- Calendar Section -->
+                    <div id="calendar"></div>
+
+                    <!-- Upcoming Holidays Sidebar -->
+                    <div class="upcoming-sidebar">
+                        <div class="card" style="margin-bottom: 24px;">
+                            <button class="btn btn-primary" style="width: 100%;" onclick="openHolidayModal()">
+                                <i class="fas fa-plus"></i> Add New Holiday
+                            </button>
+                        </div>
+
+                        <div class="card">
+                            <h3 style="margin-top: 0; margin-bottom: 16px;">All Holidays</h3>
+                            <div class="upcoming-list" id="holidaysList">
+                                <!-- Populated by JS -->
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <!-- Holiday Modal -->
+    <div id="holidayModal" class="modal">
+        <div class="modal-content">
+            <button class="modal-close" onclick="closeHolidayModal()"><i class="fas fa-times"></i></button>
+            <h3 id="holidayModalTitle" style="margin-bottom: 24px;">Add Holiday</h3>
+            
+            <form id="holidayForm">
+                <input type="hidden" id="holidayId">
+                
+                <div class="form-group">
+                    <label class="form-label">Holiday Title</label>
+                    <input type="text" id="holidayTitle" class="form-control" placeholder="e.g. Winter Break" required>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">Date</label>
+                    <input type="date" id="holidayDate" class="form-control" required>
+                </div>
+                
+                <div class="form-group">
+                    <label class="form-label">Description (Optional)</label>
+                    <textarea id="holidayDesc" class="form-control" rows="3" placeholder="Additional details..."></textarea>
+                </div>
+
+                <button type="submit" class="btn btn-primary" style="width: 100%; margin-top: 16px;" id="submitBtn">Save Holiday</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Scripts -->
+    <script src="../../js/theme.js?v=2"></script>
+    <script src="../../js/api.js?v=2"></script>
+    <script src="../../js/holidays.js?v=2"></script>
+    <script src="../../js/sidebar.js?v=2"></script>
+    <script src="../../js/router.js?v=2"></script>
+</body>
+</html>

@@ -1,7 +1,7 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
-from app.api.routes import auth, students, attendance, marks, fees, notes, papers, syllabus, holidays, notifications, timetable, search
+from app.api.routes import auth, students, teachers, attendance, marks, fees, notes, papers, syllabus, holidays, notifications, timetable, search, dashboard
 from app.core.database import engine, Base
 
 # Create database tables
@@ -24,9 +24,11 @@ app.add_middleware(
 
 app.include_router(auth.router, prefix="/api/auth", tags=["auth"])
 app.include_router(students.router, prefix="/api/students", tags=["students"])
+app.include_router(teachers.router, prefix="/api/teachers", tags=["teachers"])
 app.include_router(attendance.router, prefix="/api/attendance", tags=["attendance"])
 app.include_router(marks.router, prefix="/api/marks", tags=["marks"])
 app.include_router(fees.router, prefix="/api/fees", tags=["fees"])
+app.include_router(dashboard.router, prefix="/api/dashboard", tags=["dashboard"])
 app.include_router(notes.router, prefix="/api/notes", tags=["notes"])
 app.include_router(papers.router, prefix="/api/papers", tags=["papers"])
 app.include_router(syllabus.router, prefix="/api/syllabus", tags=["syllabus"])

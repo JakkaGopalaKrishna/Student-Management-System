@@ -13,7 +13,7 @@ class Fee(Base):
     __tablename__ = "fees"
 
     id = Column(Integer, primary_key=True, index=True)
-    student_id = Column(Integer, ForeignKey("users.id"), nullable=False, index=True)
+    student_id = Column(Integer, ForeignKey("students.id"), nullable=False, index=True)
     title = Column(String(150), nullable=False)
     total_amount = Column(Float, nullable=False)
     paid_amount = Column(Float, default=0.0)
@@ -21,7 +21,7 @@ class Fee(Base):
     status = Column(Enum(FeeStatus), default=FeeStatus.PENDING, nullable=False)
 
     # Relationships
-    student = relationship("User", back_populates="fees")
+    student = relationship("Student", back_populates="fees")
     payments = relationship("FeePayment", back_populates="fee", cascade="all, delete-orphan")
 
 class FeePayment(Base):

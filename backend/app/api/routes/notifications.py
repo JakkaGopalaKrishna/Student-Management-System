@@ -2,7 +2,7 @@ from typing import Any, List
 from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
 from app.api import deps
-from app.models.user import User, UserRole
+
 from app.models.notification import Notification, NotificationRead
 from app.schemas.notification import NotificationCreate, NotificationUpdate, NotificationResponse
 from datetime import datetime
@@ -12,7 +12,7 @@ router = APIRouter()
 @router.get("/", response_model=List[NotificationResponse])
 def get_notifications(
     db: Session = Depends(deps.get_db),
-    current_user: User = Depends(deps.get_current_active_user),
+    current_user: Any = Depends(deps.get_current_active_user),
 ) -> Any:
     """
     Retrieve all notifications. For students, annotates 'is_read'.
@@ -21,7 +21,7 @@ def get_notifications(
     
     result = []
     
-    if current_user.role == UserRole.STUDENT:
+    if current_user.role == "student":
         # Get all read records for this student
         read_records = db.query(NotificationRead).filter(NotificationRead.student_id == current_user.id).all()
         read_ids = {r.notification_id for r in read_records}
@@ -56,12 +56,12 @@ def create_notification(
     *,
     db: Session = Depends(deps.get_db),
     notif_in: NotificationCreate,
-    current_user: User = Depends(deps.get_current_active_user),
+    current_user: Any = Depends(deps.get_current_active_user),
 ) -> Any:
     """
     Create a new notification (Admin only).
     """
-    if current_user.role != UserRole.ADMIN:
+    if current_user.role != "admin":
         raise HTTPException(status_code=403, detail="Not enough permissions")
 
     db_notif = Notification(
@@ -80,12 +80,12 @@ def update_notification(
     notif_id: int,
     db: Session = Depends(deps.get_db),
     notif_in: NotificationUpdate,
-    current_user: User = Depends(deps.get_current_active_user),
+    current_user: Any = Depends(deps.get_current_active_user),
 ) -> Any:
     """
     Update a notification (Admin only).
     """
-    if current_user.role != UserRole.ADMIN:
+    if current_user.role != "admin":
         raise HTTPException(status_code=403, detail="Not enough permissions")
 
     record = db.query(Notification).filter(Notification.id == notif_id).first()
@@ -109,12 +109,12 @@ def delete_notification(
     *,
     notif_id: int,
     db: Session = Depends(deps.get_db),
-    current_user: User = Depends(deps.get_current_active_user),
+    current_user: Any = Depends(deps.get_current_active_user),
 ) -> Any:
     """
     Delete a notification (Admin only).
     """
-    if current_user.role != UserRole.ADMIN:
+    if current_user.role != "admin":
         raise HTTPException(status_code=403, detail="Not enough permissions")
 
     record = db.query(Notification).filter(Notification.id == notif_id).first()
@@ -133,12 +133,12 @@ def mark_as_read(
     *,
     notif_id: int,
     db: Session = Depends(deps.get_db),
-    current_user: User = Depends(deps.get_current_active_user),
+    current_user: Any = Depends(deps.get_current_active_user),
 ) -> Any:
     """
     Mark a notification as read (Student only).
     """
-    if current_user.role != UserRole.STUDENT:
+    if current_user.role != "student":
         raise HTTPException(status_code=403, detail="Only students can mark as read")
 
     # Check if notification exists
@@ -165,12 +165,12 @@ def mark_as_read(
 @router.post("/read-all")
 def mark_all_as_read(
     db: Session = Depends(deps.get_db),
-    current_user: User = Depends(deps.get_current_active_user),
+    current_user: Any = Depends(deps.get_current_active_user),
 ) -> Any:
     """
     Mark all notifications as read (Student only).
     """
-    if current_user.role != UserRole.STUDENT:
+    if current_user.role != "student":
         raise HTTPException(status_code=403, detail="Only students can mark as read")
 
     # Get all notifications

@@ -1,8 +1,8 @@
-document.addEventListener('DOMContentLoaded', async () => {
+(async () => {
     // Auth Check
     const token = localStorage.getItem('token');
     if (!token) {
-        window.location.href = 'index.html';
+        window.location.href = '/index.html';
         return;
     }
 
@@ -11,7 +11,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         currentUser = await authAPI.getMe();
     } catch (error) {
         localStorage.removeItem('token');
-        window.location.href = 'index.html';
+        window.location.href = '/index.html';
         return;
     }
 
@@ -83,7 +83,7 @@ document.addEventListener('DOMContentLoaded', async () => {
             
             alert('Password updated successfully! Please login again.');
             localStorage.removeItem('token');
-            window.location.href = 'index.html';
+            window.location.href = '/index.html';
         } catch (error) {
             alert('Failed to update password: ' + error.message);
         } finally {
@@ -153,7 +153,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     window.handleLogout = () => {
         if(confirm('Are you sure you want to log out?')) {
             localStorage.removeItem('token');
-            window.location.href = 'index.html';
+            window.location.href = '/index.html';
         }
     };
-});
+})();
